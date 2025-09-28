@@ -1,0 +1,28 @@
+[gd_scene load_steps=2 format=2]
+
+[ext_resource path="res://mods-unpacked/Oudstand-DamageMeter/ui/hud/dmg_source_item.gd" type="Script" id=1]
+
+[node name="DmgSourceItem" type="HBoxContainer"]
+margin_right = 150.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 150, 32 )
+custom_constants/separation = 8
+script = ExtResource( 1 )
+
+[node name="Icon" type="TextureRect" parent="."]
+margin_right = 32.0
+margin_bottom = 32.0
+rect_min_size = Vector2( 32, 32 )
+expand = true
+stretch_mode = 6
+
+[node name="DamageLabel" type="Label" parent="."]
+margin_left = 40.0
+margin_top = 4.0
+margin_right = 150.0
+margin_bottom = 29.0
+size_flags_horizontal = 3
+size_flags_vertical = 6
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+custom_colors/font_color_shadow = Color( 0, 0, 0, 0.6 )
+custom_constants/shadow_as_outline = 0
