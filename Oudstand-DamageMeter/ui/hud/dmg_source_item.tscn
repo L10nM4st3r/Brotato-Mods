@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=2]
+[gd_scene load_steps=3 format=2]
 
 [ext_resource path="res://mods-unpacked/Oudstand-DamageMeter/ui/hud/dmg_source_item.gd" type="Script" id=1]
+[ext_resource path="res://ui/menus/shop/icon_panel.tscn" type="PackedScene" id=2]
 
 [node name="DmgSourceItem" type="Control"]
 anchor_right = 1.0
@@ -13,10 +14,14 @@ margin_right = 76.0
 margin_bottom = 32.0
 custom_constants/separation = 8
 
-[node name="Icon" type="TextureRect" parent="Content"]
+[node name="IconBackground" parent="Content" instance=ExtResource( 2 )]
 margin_right = 32.0
 margin_bottom = 32.0
 rect_min_size = Vector2( 32, 32 )
+
+[node name="Icon" type="TextureRect" parent="Content/IconBackground"]
+anchor_right = 1.0
+anchor_bottom = 1.0
 expand = true
 stretch_mode = 6
 
