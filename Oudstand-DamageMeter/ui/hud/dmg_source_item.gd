@@ -57,9 +57,13 @@ func set_mod_alignment(is_right: bool) -> void:
 	content.anchor_right = content.anchor_left
 	
 	if is_right:
+		label.rect_min_size.x = 80 
+		label.align = Label.ALIGN_RIGHT 
 		content.move_child(label, 0)
 		content.move_child(icon_bg, 1)
 	else:
+		label.rect_min_size.x = 0
+		label.align = Label.ALIGN_LEFT
 		content.move_child(icon_bg, 0)
 		content.move_child(label, 1)
 	
