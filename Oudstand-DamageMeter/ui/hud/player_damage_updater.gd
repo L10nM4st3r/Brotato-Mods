@@ -2,7 +2,7 @@ extends "res://ui/hud/ui_wave_timer.gd"
 
 # === SETTINGS (You can adjust values here) ===
 const TOP_K: int = 6                    # Number of top damage sources to display (1-12)
-const SHOW_ITEM_COUNT: bool = true      # Show count for grouped items (e.g. "x5")
+const SHOW_ITEM_COUNT: bool = false     # Show count for grouped items (e.g. "x5")
 const SHOW_DPS: bool = false            # Show damage per second
 const BAR_OPACITY: float = 1.0          # Transparency (0.3-1.0)
 const UPDATE_INTERVAL: float = 0.1      # Update frequency in seconds (0.05-0.5)
