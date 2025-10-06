@@ -13,6 +13,7 @@ const COMPACT_MODE: bool = false        # Smaller icons and text
 # ===================================================
 
 const MOD_NAME: String = "DamageMeter"
+const MAX_INT32: int = 2147483647
 
 onready var _hud: Control = get_tree().get_current_scene().get_node("UI/HUD")
 
@@ -22,7 +23,7 @@ var all_display_containers: Array = []
 var wave_start_item_damages: Dictionary = {}
 var wave_start_time: float = 0.0
 
-var _prev_totals: PoolIntArray = PoolIntArray()
+var _prev_totals: Array = []
 var _prev_sigs: Array = []
 
 # Performance optimization: Cache for source structure
@@ -162,7 +163,13 @@ func _get_source_damage(source: Object, player_index: int) -> int:
 	
 	if "dmg_dealt_last_wave" in source:
 		var dmg = source.dmg_dealt_last_wave
-		return int(dmg) if typeof(dmg) == TYPE_INT or typeof(dmg) == TYPE_REAL else 0
+		# Avoid 32-bit overflow: check if value is negative (overflow indicator)
+		if typeof(dmg) == TYPE_INT or typeof(dmg) == TYPE_REAL:
+			# If negative due to overflow, clamp to safe max value
+			if dmg < 0:
+				return MAX_INT32
+			return int(dmg)
+		return 0
 	
 	if player_index < 0 or player_index >= RunData.tracked_item_effects.size():
 		return 0
@@ -185,7 +192,13 @@ func _get_source_damage(source: Object, player_index: int) -> int:
 		return 0
 	
 	var start_val = wave_start_item_damages.get(player_index, {}).get(item_id, 0)
-	return int(max(0, current_val - start_val))
+	var damage_diff = int(current_val - start_val)
+
+	# Handle overflow: if difference is negative (but values should be positive), clamp
+	if damage_diff < 0 and current_val > 0:
+		return MAX_INT32
+
+	return max(0, damage_diff) as int
 
 func _create_group_key(source: Object) -> String:
 	if not is_instance_valid(source):
@@ -286,7 +299,7 @@ func _update_damage_bars() -> void:
 		return
 	
 	var player_count = active_displays.size()
-	var totals = PoolIntArray()
+	var totals = []
 	totals.resize(player_count)
 	var max_total = 0
 	
@@ -315,7 +328,7 @@ func _update_damage_bars() -> void:
 	
 	# Calculate DPS
 	var elapsed = (OS.get_ticks_msec() / 1000.0) - wave_start_time
-	var dps_values = PoolIntArray()
+	var dps_values = []
 	dps_values.resize(player_count)
 	
 	if elapsed > 0.1:
