@@ -3,22 +3,10 @@
 [ext_resource path="res://mods-unpacked/Oudstand-DamageMeter/ui/hud/player_dmg_bar.gd" type="Script" id=1]
 [ext_resource path="res://mods-unpacked/Oudstand-DamageMeter/ui/hud/dmg_source_item.tscn" type="PackedScene" id=2]
 [ext_resource path="res://mods-unpacked/Oudstand-DamageMeter/ui/hud/player_damage_bar_reorder.gd" type="Script" id=3]
-
-[sub_resource type="StyleBoxFlat" id=1]
-bg_color = Color( 0, 0, 0, 0.498039 )
-corner_radius_top_left = 8
-corner_radius_top_right = 8
-corner_radius_bottom_right = 8
-corner_radius_bottom_left = 8
-
-[sub_resource type="StyleBoxFlat" id=3]
-bg_color = Color( 0.2, 0.45, 0.25, 1 )
-corner_radius_top_left = 6
-corner_radius_top_right = 6
-corner_radius_bottom_right = 6
-corner_radius_bottom_left = 6
-
-[sub_resource type="StyleBoxEmpty" id=2]
+[ext_resource path="res://resources/fonts/actual/base/font_26_outline.tres" type="DynamicFont" id=4]
+[ext_resource path="res://ui/hud/ui_lifebar_frame.png" type="Texture" id=5]
+[ext_resource path="res://ui/hud/ui_lifebar_bg.png" type="Texture" id=6]
+[ext_resource path="res://ui/hud/ui_lifebar_fill.png" type="Texture" id=7]
 
 [node name="PlayerDamageContainer" type="VBoxContainer"]
 margin_right = 150.0
@@ -48,30 +36,24 @@ custom_constants/margin_bottom = 0
 margin_left = 8.0
 margin_right = 142.0
 margin_bottom = 124.0
-custom_constants/separation = 2
+custom_constants/separation = 4
 
 [node name="TotalDamageBar" type="Control" parent="."]
 margin_top = 128.0
 margin_right = 150.0
-margin_bottom = 168.0
-rect_min_size = Vector2( 150, 40 )
+margin_bottom = 178.0
+rect_min_size = Vector2( 150, 50 )
 
-[node name="Background" type="Panel" parent="TotalDamageBar"]
+[node name="ProgressBar" type="TextureProgress" parent="TotalDamageBar"]
 anchor_right = 1.0
 anchor_bottom = 1.0
-custom_styles/panel = SubResource( 1 )
-
-[node name="ProgressBar" type="ProgressBar" parent="TotalDamageBar"]
-anchor_right = 1.0
-anchor_bottom = 1.0
-margin_left = 4.0
-margin_top = 4.0
-margin_right = -4.0
-margin_bottom = -4.0
-custom_styles/fg = SubResource( 3 )
-custom_styles/bg = SubResource( 2 )
+step = 0.01
 value = 50.0
-percent_visible = false
+texture_under = ExtResource( 6 )
+texture_over = ExtResource( 5 )
+texture_progress = ExtResource( 7 )
+tint_over = Color( 1, 1, 1, 0.8 )
+tint_progress = Color( 0.9, 0.6, 0.3, 1 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TotalDamageBar"]
 anchor_right = 1.0
@@ -81,19 +63,18 @@ margin_right = -8.0
 custom_constants/separation = 8
 
 [node name="CharacterIcon" type="TextureRect" parent="TotalDamageBar/HBoxContainer"]
-margin_right = 32.0
-margin_bottom = 40.0
-rect_min_size = Vector2( 32, 32 )
+margin_right = 36.0
+margin_bottom = 50.0
+rect_min_size = Vector2( 36, 36 )
 expand = true
 stretch_mode = 6
 
 [node name="DamageLabel" type="Label" parent="TotalDamageBar/HBoxContainer"]
-margin_left = 40.0
-margin_top = 13.0
+margin_left = 44.0
+margin_top = 16.0
 margin_right = 134.0
-margin_bottom = 27.0
+margin_bottom = 30.0
 size_flags_horizontal = 3
 size_flags_vertical = 6
+custom_fonts/font = ExtResource( 4 )
 custom_colors/font_color = Color( 1, 1, 1, 1 )
-custom_colors/font_color_shadow = Color( 0, 0, 0, 0.6 )
-custom_constants/shadow_as_outline = 0

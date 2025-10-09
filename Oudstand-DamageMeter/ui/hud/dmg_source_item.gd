@@ -2,8 +2,8 @@ extends Control
 
 const SPACING_LEFT: int = 8
 const SPACING_RIGHT: int = 12
-const ICON_SIZE_NORMAL: int = 32
-const ICON_SIZE_COMPACT: int = 24
+const ICON_SIZE_NORMAL: int = 40
+const ICON_SIZE_COMPACT: int = 32
 const LABEL_WIDTH_RIGHT: int = 250
 
 onready var content: HBoxContainer = $Content

@@ -2,13 +2,11 @@ extends VBoxContainer
 
 export(PackedScene) var source_item_scene
 
-onready var progress_bar: ProgressBar = $TotalDamageBar/ProgressBar
+onready var progress_bar: TextureProgress = $TotalDamageBar/ProgressBar
 onready var icon_rect: TextureRect = $TotalDamageBar/HBoxContainer/CharacterIcon
 onready var label: Label = $TotalDamageBar/HBoxContainer/DamageLabel
 onready var source_list: VBoxContainer = $SourceListBackground/MarginContainer/SourceList
 onready var hbox: HBoxContainer = $TotalDamageBar/HBoxContainer
-
-var style_normal: StyleBox = null
 
 var _current_progress: float = 0.0
 var _target_progress: float = 0.0
@@ -23,22 +21,15 @@ var _fade_speed: float = 8.0
 var _max_alpha: float = 1.0
 var _compact_mode: bool = false
 
-const ROW_HEIGHT_NORMAL: int = 32
-const ROW_HEIGHT_COMPACT: int = 24
-const ICON_SIZE_NORMAL: int = 32
-const ICON_SIZE_COMPACT: int = 24
-const SEPARATION: int = 2
+const ROW_HEIGHT_NORMAL: int = 40
+const ROW_HEIGHT_COMPACT: int = 32
+const ICON_SIZE_NORMAL: int = 40
+const ICON_SIZE_COMPACT: int = 32
+const SEPARATION: int = 4
 const MAX_SOURCES: int = 12
 
 func _ready() -> void:
-	_init_styles()
 	progress_bar.value = 0.0
-	progress_bar.connect("resized", self, "_on_progress_resized")
-
-func _init_styles() -> void:
-	var base_style = progress_bar.get("custom_styles/fg")
-	style_normal = base_style if base_style else StyleBoxFlat.new()
-	progress_bar.add_stylebox_override("fg", style_normal)
 
 func set_animation_settings(animation_speed: float, opacity: float, compact_mode: bool) -> void:
 	_lerp_speed = animation_speed
@@ -57,10 +48,6 @@ func _process(delta: float) -> void:
 		_current_alpha = lerp(_current_alpha, _target_alpha, _fade_speed * delta)
 		modulate.a = _current_alpha
 
-func _on_progress_resized() -> void:
-	if _mirrored:
-		progress_bar.rect_pivot_offset = progress_bar.rect_size / 2.0
-
 func _set_layout(player_index: int) -> void:
 	var is_right = (player_index == 1 or player_index == 3)
 
@@ -74,8 +61,10 @@ func _set_layout(player_index: int) -> void:
 
 	if _mirrored != is_right:
 		_mirrored = is_right
-		progress_bar.rect_scale.x = -1.0 if is_right else 1.0
-		progress_bar.rect_pivot_offset = progress_bar.rect_size / 2.0 if is_right else Vector2.ZERO
+		if is_right:
+			progress_bar.fill_mode = TextureProgress.FILL_RIGHT_TO_LEFT
+		else:
+			progress_bar.fill_mode = TextureProgress.FILL_LEFT_TO_RIGHT
 
 func update_total_damage(
 	damage: int, 

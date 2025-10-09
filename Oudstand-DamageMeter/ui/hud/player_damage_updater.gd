@@ -337,7 +337,7 @@ func _update_damage_bars() -> void:
 	
 	# Determine if percentage should be shown (only for multiple players)
 	var show_percentage_ui = SHOW_PERCENTAGE and player_count > 1
-
+	
 	# Update UI
 	for i in range(player_count):
 		if i >= active_displays.size() or not is_instance_valid(active_displays[i]):
