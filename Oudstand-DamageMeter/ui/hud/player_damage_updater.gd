@@ -8,7 +8,7 @@ const BAR_OPACITY: float = 1.0          # Transparency (0.3-1.0)
 const UPDATE_INTERVAL: float = 0.1      # Update frequency in seconds (0.05-0.5)
 const ANIMATION_SPEED: float = 6.0      # Bar animation speed (1.0-20.0)
 const MIN_DAMAGE_FILTER: int = 1        # Minimum damage to display (0 = all)
-const SHOW_PERCENTAGE: bool = true      # Show percentage values
+const SHOW_PERCENTAGE: bool = true      # Show percentage values (only if multiple players)
 const COMPACT_MODE: bool = false        # Smaller icons and text
 # ===================================================
 
@@ -335,6 +335,9 @@ func _update_damage_bars() -> void:
 		for i in range(player_count):
 			dps_values[i] = int(float(totals[i]) / elapsed)
 	
+	# Determine if percentage should be shown (only for multiple players)
+	var show_percentage_ui = SHOW_PERCENTAGE and player_count > 1
+
 	# Update UI
 	for i in range(player_count):
 		if i >= active_displays.size() or not is_instance_valid(active_displays[i]):
@@ -364,7 +367,7 @@ func _update_damage_bars() -> void:
 			i,
 			SHOW_DPS,
 			dps,
-			SHOW_PERCENTAGE
+			show_percentage_ui
 		)
 		
 		# Only update source list when changed
