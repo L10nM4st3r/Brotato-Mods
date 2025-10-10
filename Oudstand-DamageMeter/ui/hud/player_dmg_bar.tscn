@@ -48,7 +48,6 @@ value = 50.0
 texture_under = ExtResource( 6 )
 texture_over = ExtResource( 5 )
 texture_progress = ExtResource( 7 )
-tint_over = Color( 1, 1, 1, 0.8 )
 tint_progress = Color( 0.9, 0.6, 0.3, 1 )
 
 [node name="HBoxContainer" type="HBoxContainer" parent="TotalDamageBar"]
