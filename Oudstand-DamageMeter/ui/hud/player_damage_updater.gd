@@ -291,17 +291,41 @@ func _collect_grouped_sources(player_index: int) -> Array:
 
 		var key = _create_group_key(source)
 		if groups.has(key):
-			groups[key].damage += dmg
 			groups[key].count += 1
-		else:
-			groups[key] = {
-				"source": source,
-				"damage": dmg,
-				"group_key": key,
-				"count": 1
-			}
+			continue
+
+		groups[key] = {
+			"source": source,
+			"damage": dmg,
+			"group_key": key,
+			"count": 1
+		}
+
+	# Override count for Pocket Factory spawned turrets
+	_apply_spawned_count_overrides(groups, player_index)
 
 	return groups.values()
+
+func _apply_spawned_count_overrides(groups: Dictionary, player_index: int) -> void:
+	# Get Main scene to access Pocket Factory spawn counts
+	var main = get_tree().get_current_scene()
+	if not is_instance_valid(main) or not main.has_method("get_pocket_factory_spawns"):
+		return
+
+	var has_pf_item = RunData.get_nb_item("item_pocket_factory", player_index) > 0
+	if not has_pf_item:
+		return
+
+	var pf_spawns = main.get_pocket_factory_spawns(player_index)
+	if pf_spawns < 0:
+		return
+
+	# Find common turret group and add Pocket Factory spawns to count
+	var turret_key = "item_turret_t0_cFalse"  # Common, non-cursed turret (matches Godot dictionary string)
+	if groups.has(turret_key):
+		var base_count = groups[turret_key].count
+		var non_pf_sources = max(0, base_count - 1)  # subtract Pocket Factory placeholder if present
+		groups[turret_key].count = pf_spawns + non_pf_sources
 
 func _get_top_sources(player_index: int) -> Array:
 	var all_sources = _collect_grouped_sources(player_index)

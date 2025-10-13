@@ -4,6 +4,7 @@ const COMPACT_SEPARATION: int = 2
 const MOD_DIR_NAME := "Oudstand-DamageMeter"
 
 var _damage_meters_injected: bool = false
+var _pocket_factory_turret_spawns: Array = [0, 0, 0, 0]  # Track Pocket Factory turret spawns per player
 
 # Use _enter_tree instead of _ready to inject nodes early
 func _enter_tree() -> void:
@@ -36,7 +37,12 @@ func _inject_damage_meters() -> void:
 # This is called after players are spawned and UI is set up
 func _on_EntitySpawner_players_spawned(players: Array) -> void:
 	._on_EntitySpawner_players_spawned(players)
+	_reset_pocket_factory_spawns()
 	_setup_damage_meter_positioning()
+
+func _reset_pocket_factory_spawns() -> void:
+	for i in range(4):
+		_pocket_factory_turret_spawns[i] = 0
 
 func _setup_damage_meter_positioning() -> void:
 	var player_count = RunData.get_player_count()
@@ -85,3 +91,22 @@ func _reorder_damage_bar_for_bottom_player(dmg_container: Control) -> void:
 	var total_damage_bar = dmg_container.get_node_or_null("TotalDamageBar")
 	if is_instance_valid(total_damage_bar):
 		dmg_container.move_child(total_damage_bar, dmg_container.get_child_count() - 1)
+
+# Override _on_neutral_died to track Pocket Factory turret spawns
+func _on_neutral_died(neutral: Neutral, args: Entity.DieArgs) -> void:
+	# Track Pocket Factory turret spawns BEFORE calling parent
+	if not _cleaning_up:
+		for player in _get_shuffled_live_players():
+			var player_index = player.player_index
+			var tree_turrets_count = RunData.get_player_effect("tree_turrets", player_index)
+			if tree_turrets_count > 0:
+				_pocket_factory_turret_spawns[player_index] += tree_turrets_count
+
+	# Call parent implementation
+	._on_neutral_died(neutral, args)
+
+# Getter for player_damage_updater.gd to access spawn counts
+func get_pocket_factory_spawns(player_index: int) -> int:
+	if player_index < 0 or player_index >= 4:
+		return 0
+	return _pocket_factory_turret_spawns[player_index]
