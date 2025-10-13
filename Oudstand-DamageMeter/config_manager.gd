@@ -37,11 +37,11 @@ func _sync_to_mod_options(mods_config_interface) -> void:
 
 	# Update ModOptions config with our saved values
 	var config = mod_configs["Oudstand-DamageMeter"]
-	config["number_of_sources"] = float(TOP_K)
-	config["show_item_count"] = SHOW_ITEM_COUNT
-	config["show_dps"] = SHOW_DPS
-	config["opacity"] = BAR_OPACITY
-	config["show_percentage"] = SHOW_PERCENTAGE
+	config["DAMAGEMETER_NUMBER_OF_SOURCES"] = float(TOP_K)
+	config["DAMAGEMETER_SHOW_ITEM_COUNT"] = SHOW_ITEM_COUNT
+	config["DAMAGEMETER_SHOW_DPS"] = SHOW_DPS
+	config["DAMAGEMETER_OPACITY"] = BAR_OPACITY
+	config["DAMAGEMETER_SHOW_PERCENTAGE"] = SHOW_PERCENTAGE
 
 	ModLoaderLog.info("ConfigManager synced values to ModOptions UI", MOD_NAME)
 
@@ -49,24 +49,18 @@ func _on_setting_changed(setting_name: String, value, mod_name: String) -> void:
 	if mod_name != "Oudstand-DamageMeter":
 		return
 
-	# Ignore helper settings
-	if (setting_name.ends_with("_min") or setting_name.ends_with("_max") or
-		setting_name.ends_with("_step") or setting_name.ends_with("_format") or
-		setting_name.ends_with("_tooltip")):
-		return
-
 	ModLoaderLog.info("ConfigManager: Setting changed: %s = %s" % [setting_name, str(value)], MOD_NAME)
 
 	match setting_name:
-		"number_of_sources":
+		"DAMAGEMETER_NUMBER_OF_SOURCES":
 			TOP_K = int(clamp(round(value), 1.0, 25.0))
-		"show_item_count":
+		"DAMAGEMETER_SHOW_ITEM_COUNT":
 			SHOW_ITEM_COUNT = bool(value)
-		"show_dps":
+		"DAMAGEMETER_SHOW_DPS":
 			SHOW_DPS = bool(value)
-		"opacity":
+		"DAMAGEMETER_OPACITY":
 			BAR_OPACITY = clamp(float(value), 0.3, 1.0)
-		"show_percentage":
+		"DAMAGEMETER_SHOW_PERCENTAGE":
 			SHOW_PERCENTAGE = bool(value)
 
 	# Save and notify

@@ -13,22 +13,40 @@
             "tags": [ "damage", "hud", "player", "bar", "weapons", "items" ],
             "compatible_mod_loader_version": [ "6.2.0" ],
             "compatible_game_version": [ "1.1.12.0" ],
-            "config_defaults": {
-                "opacity": 1.0,
-                "opacity_min": 0.3,
-                "opacity_max": 1.0,
-                "opacity_step": 0.1,
-                "opacity_format": "%.1f",
-                "number_of_sources": 6.0,
-                "number_of_sources_min": 1.0,
-                "number_of_sources_max": 25.0,
-                "number_of_sources_step": 1.0,
-                "number_of_sources_format": "%.0f",
-                "show_item_count": false,
-                "show_dps": false,
-                "show_percentage": true
-            },
-            "config_schema": {}
+            "config_defaults": {},
+            "config_schema": {
+                "type": "object",
+                "properties": {
+                    "DAMAGEMETER_OPACITY": {
+                        "type": "number",
+                        "default": 1.0,
+                        "minimum": 0.3,
+                        "maximum": 1.0,
+                        "multipleOf": 0.1,
+                        "format": "%.1f"
+                    },
+                    "DAMAGEMETER_NUMBER_OF_SOURCES": {
+                        "type": "number",
+                        "default": 6.0,
+                        "minimum": 1.0,
+                        "maximum": 25.0,
+                        "multipleOf": 1.0,
+                        "format": "%.0f"
+                    },
+                    "DAMAGEMETER_SHOW_ITEM_COUNT": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "DAMAGEMETER_SHOW_DPS": {
+                        "type": "boolean",
+                        "default": false
+                    },
+                    "DAMAGEMETER_SHOW_PERCENTAGE": {
+                        "type": "boolean",
+                        "default": true
+                    }
+                }
+            }
         }
     }
 }
