@@ -30,24 +30,48 @@ func _give_items():
 	# --- HIER KANNST DU DEINE START-WAFFEN ANPASSEN ---
 	# Das Format ist: ["waffen_id", is_cursed (true/false)]
 	var weapons_to_give = [
-		#["weapon_revolver_1", true],
-		#["weapon_revolver_1", false],
+		# ["weapon_revolver_1", true],
+		# ["weapon_revolver_1", false],
 	]
 	
 	# --- HIER KANNST DU DEINE START-ITEMS ANPASSEN ---
+	# Das Format ist: ["item_id", is_cursed (true/false)]
+	# Wenn nur die ID angegeben wird (String), wird das Item NICHT verflucht sein.
 	var items_to_give = [
-		"item_pocket_factory",
+		# "item_pocket_factory",
 		"item_baby_elephant",
-		"item_hunting_trophy",
-		"item_hunting_trophy",
-		"item_hunting_trophy",
-		"item_tree",
-		"item_tree",
-		"item_tree",
-		"item_tree",
-		"item_tree",
-		"item_tree",
-		"item_tree"
+		"item_baby_elephant",
+		"item_baby_elephant",
+		"item_baby_elephant",
+		"item_baby_elephant",
+		["item_baby_elephant", true],
+		# "item_hunting_trophy",
+		# "item_hunting_trophy",
+		# "item_hunting_trophy",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		# "item_tree",
+		"item_evil_hat",
+		# "item_ricochet",
+		# "item_ricochet",
+		# "item_ricochet",
+		# "item_seashell",
+		# "item_lumberjack_shirt",
+		# "item_blindfold",
+		# "item_cyberball",
+		# "item_cyberball",
+		# ["item_cyberball", true],
 	]
 
 	# --- Waffen-Logik ---
@@ -72,12 +96,23 @@ func _give_items():
 		ModLoaderLog.error("ItemService or ItemService.weapons not found!", "TestItems")
 
 	# --- Item-Logik ---
-	for item_id in items_to_give:
+	for item_data in items_to_give:
+		var item_id = ""
+		var is_cursed = false
+
+		# Unterstützt beide Formate: "item_id" oder ["item_id", true/false]
+		if typeof(item_data) == TYPE_ARRAY:
+			item_id = item_data[0]
+			is_cursed = item_data[1] if item_data.size() > 1 else false
+		else:
+			item_id = item_data
+
 		var item = ItemService.get_element(ItemService.items, item_id)
 		if is_instance_valid(item):
 			item = item.duplicate()
+			item.is_cursed = is_cursed
 			RunData.add_item(item, player_index)
-			ModLoaderLog.info("Added item: %s" % item_id, "TestItems")
+			ModLoaderLog.info("Added item: %s (cursed: %s)" % [item_id, is_cursed], "TestItems")
 		else:
 			ModLoaderLog.error("Failed to create item: %s" % item_id, "TestItems")
 	
