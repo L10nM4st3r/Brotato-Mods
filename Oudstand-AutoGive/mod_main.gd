@@ -28,70 +28,64 @@ func _give_items():
 	var player_index = 0
 	
 	# --- HIER KANNST DU DEINE START-WAFFEN ANPASSEN ---
-	# Das Format ist: ["waffen_id", is_cursed (true/false)]
+	# Format-Optionen:
+	#   "weapon_id"                    -> 1x normal (nicht verflucht)
+	#   ["weapon_id", is_cursed]       -> 1x mit cursed status
+	#   ["weapon_id", is_cursed, 3]    -> 3x mit cursed status
 	var weapons_to_give = [
+		# "weapon_revolver_1",
 		# ["weapon_revolver_1", true],
-		# ["weapon_revolver_1", false],
+		# ["weapon_revolver_1", false, 2],  # 2x normal
 	]
-	
+
 	# --- HIER KANNST DU DEINE START-ITEMS ANPASSEN ---
-	# Das Format ist: ["item_id", is_cursed (true/false)]
-	# Wenn nur die ID angegeben wird (String), wird das Item NICHT verflucht sein.
+	# Format-Optionen:
+	#   "item_id"                      -> 1x normal (nicht verflucht)
+	#   ["item_id", is_cursed]         -> 1x mit cursed status
+	#   ["item_id", is_cursed, 5]      -> 5x mit cursed status
 	var items_to_give = [
-		# "item_pocket_factory",
-		"item_baby_elephant",
-		"item_baby_elephant",
-		"item_baby_elephant",
-		"item_baby_elephant",
-		"item_baby_elephant",
-		["item_baby_elephant", true],
-		# "item_hunting_trophy",
-		# "item_hunting_trophy",
-		# "item_hunting_trophy",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		# "item_tree",
-		"item_evil_hat",
-		# "item_ricochet",
-		# "item_ricochet",
-		# "item_ricochet",
-		# "item_seashell",
-		# "item_lumberjack_shirt",
-		# "item_blindfold",
-		# "item_cyberball",
+		# ["item_baby_elephant", false, 5],  # 5x normal
+		# ["item_hunting_trophy", false, 3],
+		# ["item_tree", false, 14],
 		# "item_cyberball",
 		# ["item_cyberball", true],
+		# "item_greek_fire",
+		# "item_giant_belt",
+		# ["item_blindfold",false, 20],
+		# ["item_alien_baby", false, 500]
 	]
 
 	# --- Waffen-Logik ---
 	var all_weapons_list = ItemService.get("weapons")
 	if is_instance_valid(ItemService) and all_weapons_list != null:
 		for weapon_data in weapons_to_give:
+			var weapon_id = ""
+			var is_cursed = false
+			var count = 1
+
+			# Parse format: "weapon_id" oder ["weapon_id", is_cursed] oder ["weapon_id", is_cursed, count]
+			if typeof(weapon_data) == TYPE_ARRAY:
+				weapon_id = weapon_data[0]
+				is_cursed = weapon_data[1] if weapon_data.size() > 1 else false
+				count = weapon_data[2] if weapon_data.size() > 2 else 1
+			else:
+				weapon_id = weapon_data
+
 			var base_weapon = null
 			for w in all_weapons_list:
 				var current_weapon_id = w.get("my_id")
-				if current_weapon_id != null and current_weapon_id == weapon_data[0]:
+				if current_weapon_id != null and current_weapon_id == weapon_id:
 					base_weapon = w
 					break
-			
+
 			if is_instance_valid(base_weapon):
-				var weapon = base_weapon.duplicate()
-				weapon.is_cursed = weapon_data[1]
-				RunData.add_weapon(weapon, player_index)
-				ModLoaderLog.info("Added weapon: %s" % weapon_data[0], "TestItems")
+				for _i in range(count):
+					var weapon = base_weapon.duplicate()
+					weapon.is_cursed = is_cursed
+					RunData.add_weapon(weapon, player_index)
+				ModLoaderLog.info("Added weapon: %s (cursed: %s, count: %d)" % [weapon_id, is_cursed, count], "TestItems")
 			else:
-				ModLoaderLog.error("Weapon not found in ItemService.weapons: %s" % weapon_data[0], "TestItems")
+				ModLoaderLog.error("Weapon not found in ItemService.weapons: %s" % weapon_id, "TestItems")
 	else:
 		ModLoaderLog.error("ItemService or ItemService.weapons not found!", "TestItems")
 
@@ -99,20 +93,23 @@ func _give_items():
 	for item_data in items_to_give:
 		var item_id = ""
 		var is_cursed = false
+		var count = 1
 
-		# Unterstützt beide Formate: "item_id" oder ["item_id", true/false]
+		# Parse format: "item_id" oder ["item_id", is_cursed] oder ["item_id", is_cursed, count]
 		if typeof(item_data) == TYPE_ARRAY:
 			item_id = item_data[0]
 			is_cursed = item_data[1] if item_data.size() > 1 else false
+			count = item_data[2] if item_data.size() > 2 else 1
 		else:
 			item_id = item_data
 
 		var item = ItemService.get_element(ItemService.items, item_id)
 		if is_instance_valid(item):
-			item = item.duplicate()
-			item.is_cursed = is_cursed
-			RunData.add_item(item, player_index)
-			ModLoaderLog.info("Added item: %s (cursed: %s)" % [item_id, is_cursed], "TestItems")
+			for _i in range(count):
+				var item_copy = item.duplicate()
+				item_copy.is_cursed = is_cursed
+				RunData.add_item(item_copy, player_index)
+			ModLoaderLog.info("Added item: %s (cursed: %s, count: %d)" % [item_id, is_cursed, count], "TestItems")
 		else:
 			ModLoaderLog.error("Failed to create item: %s" % item_id, "TestItems")
 	
