@@ -367,6 +367,12 @@ func _collect_grouped_sources(player_index: int) -> Array:
 	# Override count for Pocket Factory spawned turrets
 	_apply_spawned_count_overrides(groups, player_index)
 
+	# Remove items that double-count damage (their damage is already included in weapon/item sources)
+	# - Greek Fire: damage is included in burning sources
+	# - Giant Belt: damage is included in crit sources
+	groups.erase("item_greek_fire_t3")
+	groups.erase("item_giant_belt_t3")
+
 	return groups.values()
 
 func _apply_spawned_count_overrides(groups: Dictionary, player_index: int) -> void:
