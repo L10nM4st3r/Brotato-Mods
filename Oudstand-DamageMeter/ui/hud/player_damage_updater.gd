@@ -136,6 +136,20 @@ func _snapshot_wave_start(player_count: int) -> void:
 	wave_start_item_damages.clear()
 	wave_start_time = OS.get_ticks_msec() / 1000.0
 
+	# Update charm tracking state for performance optimization
+	var charm_tracker = get_node_or_null("/root/ModLoader/Oudstand-DamageMeter/DamageMeterCharmTracker")
+	if is_instance_valid(charm_tracker):
+		charm_tracker.update_charm_tracking_state()
+
+		# Initialize charmed_enemies_damage key if charm tracking is enabled
+		# This ensures the key exists in RunData.tracked_item_effects
+		# It will be filtered by MIN_DAMAGE_FILTER until damage >= 1
+		if charm_tracker.charm_tracking_enabled:
+			for i in range(player_count):
+				if RunData.tracked_item_effects.size() > i:
+					RunData.tracked_item_effects[i]["charmed_enemies_damage"] = 0
+
+
 	# Find builder turrets and update their tracking keys
 	_fix_builder_turret_tracking_keys(player_count)
 
@@ -151,6 +165,10 @@ func _snapshot_wave_start(player_count: int) -> void:
 			# For builder turret items, the game resets the counter between waves
 			# We reset both the snapshot AND the actual value to ensure sync
 			if item_id.begins_with("item_builder_turret_"):
+				RunData.tracked_item_effects[i][item_id] = 0
+				item_map[item_id] = 0
+			# For charmed enemies damage, also reset between waves
+			elif item_id == "charmed_enemies_damage":
 				RunData.tracked_item_effects[i][item_id] = 0
 				item_map[item_id] = 0
 			else:
@@ -222,31 +240,54 @@ func _get_spawned_items_for_weapon(weapon: Object) -> Array:
 
 func _get_spawned_items_for_item(item: Object) -> Array:
 	var spawned = []
-	
+
 	if not is_instance_valid(item) or not "my_id" in item:
 		return spawned
-	
+
 	if item.my_id == "item_pocket_factory":
 		var turret = ItemService.get_item_from_id("item_turret")
 		if is_instance_valid(turret):
 			spawned.append(turret)
-	
+
 	return spawned
 
-func _is_damage_tracking_item(source: Object) -> bool:
-	if not is_instance_valid(source):
+func _create_virtual_charm_item() -> Dictionary:
+	var charm_item = {
+		"my_id": "charmed_enemies_damage",
+		"name": "CHARMED_ENEMIES",
+		"tier": Tier.COMMON,
+		"is_cursed": false
+	}
+
+	# Use Romantic character icon for charm damage
+	for character in ItemService.characters:
+		if is_instance_valid(character) and character.my_id == "character_romantic":
+			if "icon" in character and is_instance_valid(character.icon):
+				charm_item["icon"] = character.icon
+				break
+
+	return charm_item
+
+func _is_damage_tracking_item(source) -> bool:
+	# Allow both Objects and Dictionaries
+	if not is_instance_valid(source) and typeof(source) != TYPE_DICTIONARY:
 		return false
-	
+
 	if "name" in source and source.name == "ITEM_BUILDER_TURRET":
 		return true
-	
+
+	# Special case for charmed enemies (virtual Dictionary item)
+	if "my_id" in source and source.my_id == "charmed_enemies_damage":
+		return true
+
 	if not "tracking_text" in source:
 		return false
-	
+
 	return source.tracking_text == "DAMAGE_DEALT"
 
-func _get_source_damage(source: Object, player_index: int) -> int:
-	if not is_instance_valid(source):
+func _get_source_damage(source, player_index: int) -> int:
+	# Allow both Objects and Dictionaries
+	if not is_instance_valid(source) and typeof(source) != TYPE_DICTIONARY:
 		return 0
 
 	if "dmg_dealt_last_wave" in source:
@@ -277,8 +318,9 @@ func _get_source_damage(source: Object, player_index: int) -> int:
 
 	return max(0, damage_diff) as int
 
-func _create_group_key(source: Object) -> String:
-	if not is_instance_valid(source):
+func _create_group_key(source) -> String:
+	# Allow both Objects and Dictionaries
+	if not is_instance_valid(source) and typeof(source) != TYPE_DICTIONARY:
 		return ""
 
 	var base = source.my_id if "my_id" in source else ""
@@ -319,6 +361,13 @@ func _build_source_cache(player_index: int) -> Array:
 		for spawned in _get_spawned_items_for_item(item):
 			sources.append(spawned)
 
+	# Add virtual item for charmed enemies damage (if tracked)
+	if RunData.tracked_item_effects.size() > player_index:
+		var effects = RunData.tracked_item_effects[player_index]
+		if effects.has("charmed_enemies_damage"):
+			var charm_item = _create_virtual_charm_item()
+			sources.append(charm_item)
+
 	return sources
 
 func _collect_grouped_sources(player_index: int) -> Array:
@@ -330,7 +379,8 @@ func _collect_grouped_sources(player_index: int) -> Array:
 	var cached_sources = _source_cache[player_index]
 
 	for source in cached_sources:
-		if not is_instance_valid(source):
+		# Skip invalid sources, but allow Dictionaries (charm item)
+		if not is_instance_valid(source) and typeof(source) != TYPE_DICTIONARY:
 			continue
 
 		var dmg = _get_source_damage(source, player_index)
@@ -339,6 +389,7 @@ func _collect_grouped_sources(player_index: int) -> Array:
 			continue
 
 		var key = _create_group_key(source)
+
 		if groups.has(key):
 			groups[key].count += 1
 

@@ -28,7 +28,9 @@ func _ready() -> void:
 
 func set_data(source_info: Dictionary, show_item_count: bool = true) -> void:
 	var source = source_info.get("source")
-	if not is_instance_valid(source) or not "icon" in source:
+	# Allow both Objects and Dictionaries
+	var is_valid = is_instance_valid(source) or typeof(source) == TYPE_DICTIONARY
+	if not is_valid or not "icon" in source:
 		return
 
 	var damage = source_info.get("damage", 0)
@@ -46,7 +48,7 @@ func set_data(source_info: Dictionary, show_item_count: bool = true) -> void:
 			count_badge.visible = false
 
 	if is_instance_valid(icon):
-		icon.texture = source.icon
+		icon.texture = source.icon if typeof(source) != TYPE_DICTIONARY else source["icon"]
 
 	# Set background color based on rarity
 	if "tier" in source:

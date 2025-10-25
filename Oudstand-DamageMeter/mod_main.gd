@@ -19,13 +19,24 @@ func _init():
 	config_manager.name = "DamageMeterConfig"
 	add_child(config_manager)
 
-	var extensions_dir_path = mod_dir_path.plus_file("ui/hud")
-	ModLoaderMod.install_script_extension(extensions_dir_path.plus_file("player_damage_updater.gd"))
-	# Don't extend player_ui_elements.gd - it causes signal duplication issues
-	# ModLoaderMod.install_script_extension(extensions_dir_path.plus_file("player_damage_positioning.gd"))
+	# Install script extensions
+	var extensions_dir_path = mod_dir_path.plus_file("extensions")
+	# Add CharmTracker as an autoload (singleton) - for DLC charm feature
+	# This tracks whether any player has charm capabilities (Flute/Romantic) to enable/disable tracking
+	var charm_tracker_script = load(extensions_dir_path.plus_file("charm_tracker.gd"))
+	var charm_tracker = charm_tracker_script.new()
+	charm_tracker.name = "DamageMeterCharmTracker"
+	add_child(charm_tracker)
 
-	# Instead, extend Main.gd to handle positioning
-	ModLoaderMod.install_script_extension(extensions_dir_path.plus_file("main_extension.gd"))
+	# Extend enemy.gd to track damage dealt by charmed enemies (DLC feature)
+	ModLoaderMod.install_script_extension(extensions_dir_path.plus_file("enemy_extension.gd"))
+
+	# Extend UI components
+	var ui_extensions_dir_path = mod_dir_path.plus_file("ui/hud")
+	ModLoaderMod.install_script_extension(ui_extensions_dir_path.plus_file("player_damage_updater.gd"))
+
+	# Extend Main.gd to handle positioning (don't extend player_ui_elements.gd - causes signal duplication)
+	ModLoaderMod.install_script_extension(ui_extensions_dir_path.plus_file("main_extension.gd"))
 
 func _ready():
 	# Initialize config for ModLoader (like Trade mod does)
