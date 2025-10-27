@@ -10,9 +10,14 @@ func _process(_delta):
 	# Wir prüfen in jedem Frame (Polling), ob ein Lauf gestartet wurde.
 	# Ein Signal-basierter Ansatz war in Tests nicht zuverlässig, daher diese robuste Methode.
 	if not items_given and is_instance_valid(RunData) and RunData.get_player_count() > 0 and RunData.current_wave >= 1:
+		# WICHTIG: Wir müssen warten, bis die Main-Szene aktiv ist (nicht mehr Pause/Character Selection)
+		var current_scene = get_tree().get_current_scene()
+		if not is_instance_valid(current_scene) or current_scene.name != "Main":
+			return  # Warte, bis Main-Szene aktiv ist
+
 		items_given = true
-		ModLoaderLog.info("Run detected (Wave >= 1, Players > 0). Giving items now!", "TestItems")
-		
+		ModLoaderLog.info("Run detected in Main scene (Wave >= 1, Players > 0). Giving items now!", "TestItems")
+
 		# Wir warten eine Sekunde, um sicherzustellen, dass die Spiel-UI vollständig geladen ist,
 		# bevor wir versuchen, sie zu aktualisieren.
 		yield(get_tree().create_timer(1.0), "timeout")
@@ -33,9 +38,11 @@ func _give_items():
 	#   ["weapon_id", is_cursed]       -> 1x mit cursed status
 	#   ["weapon_id", is_cursed, 3]    -> 3x mit cursed status
 	var weapons_to_give = [
-		# "weapon_revolver_1",
-		# ["weapon_revolver_1", true],
+		"weapon_revolver_3",
+		"weapon_revolver_4",
+		["weapon_revolver_3", true],
 		# ["weapon_revolver_1", false, 2],  # 2x normal
+		# ["weapon_flute_4", true, 5]
 	]
 
 	# --- HIER KANNST DU DEINE START-ITEMS ANPASSEN ---
@@ -46,13 +53,14 @@ func _give_items():
 	var items_to_give = [
 		# ["item_baby_elephant", false, 5],  # 5x normal
 		# ["item_hunting_trophy", false, 3],
-		# ["item_tree", false, 14],
+		["item_tree", false, 14],
+		# "item_pocket_factory"
 		# "item_cyberball",
 		# ["item_cyberball", true],
 		# "item_greek_fire",
 		# "item_giant_belt",
 		# ["item_blindfold",false, 20],
-		# ["item_alien_baby", false, 500]
+		# ["item_alien_baby", false, 100]
 	]
 
 	# --- Waffen-Logik ---
@@ -82,8 +90,12 @@ func _give_items():
 				for _i in range(count):
 					var weapon = base_weapon.duplicate()
 					weapon.is_cursed = is_cursed
-					RunData.add_weapon(weapon, player_index)
-				ModLoaderLog.info("Added weapon: %s (cursed: %s, count: %d)" % [weapon_id, is_cursed, count], "TestItems")
+					var returned_weapon = RunData.add_weapon(weapon, player_index)
+					ModLoaderLog.info("add_weapon returned: %s" % (returned_weapon.my_id if is_instance_valid(returned_weapon) else "null"), "TestItems")
+
+				# Verify weapons were added
+				var current_weapons = RunData.get_player_weapons(player_index)
+				ModLoaderLog.info("Added weapon: %s (cursed: %s, count: %d) - Total weapons now: %d" % [weapon_id, is_cursed, count, current_weapons.size()], "TestItems")
 			else:
 				ModLoaderLog.error("Weapon not found in ItemService.weapons: %s" % weapon_id, "TestItems")
 	else:
@@ -109,13 +121,26 @@ func _give_items():
 				var item_copy = item.duplicate()
 				item_copy.is_cursed = is_cursed
 				RunData.add_item(item_copy, player_index)
-			ModLoaderLog.info("Added item: %s (cursed: %s, count: %d)" % [item_id, is_cursed, count], "TestItems")
+
+			# Verify items were added
+			var current_items = RunData.get_player_items(player_index)
+			ModLoaderLog.info("Added item: %s (cursed: %s, count: %d) - Total items now: %d" % [item_id, is_cursed, count, current_items.size()], "TestItems")
 		else:
 			ModLoaderLog.error("Failed to create item: %s" % item_id, "TestItems")
 	
 	ModLoaderLog.info("=== ITEMS GIVEN SUCCESSFULLY ===", "TestItems")
-	
-	# UI Refresh: Sendet Signale, damit das Spiel die Anzeige aktualisiert.
+
+	# UI Refresh: Force player entity and stats update (signals no longer exist in 1.1.13.0)
 	yield(get_tree(), "idle_frame")
-	if RunData.has_signal("items_changed"): RunData.emit_signal("items_changed")
-	if RunData.has_signal("weapons_changed"): RunData.emit_signal("weapons_changed")
+
+	# Get the main scene to access players
+	var main = get_tree().get_current_scene()
+	if is_instance_valid(main) and "_players" in main:
+		for i in range(main._players.size()):
+			var player = main._players[i]
+			if is_instance_valid(player) and player.has_method("update_player_stats"):
+				player.update_player_stats(false)
+
+	# Reset linked stats to recalculate all stat bonuses
+	for i in RunData.get_player_count():
+		LinkedStats.reset_player(i)
