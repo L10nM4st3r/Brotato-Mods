@@ -7,7 +7,7 @@
     "dependencies": [],
     "extra": {
         "godot": {
-            "optional_dependencies": ["dami-ModOptions"],
+            "optional_dependencies": [],
             "incompatibilities": [],
             "authors": [ "Oudstand" ],
             "tags": [ "damage", "hud", "player", "bar", "weapons", "items" ],

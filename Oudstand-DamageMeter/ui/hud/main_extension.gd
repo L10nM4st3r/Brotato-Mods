@@ -31,7 +31,6 @@ func _inject_damage_meters() -> void:
 		dmg_container.name = node_name
 		parent_node.add_child(dmg_container)
 
-	ModLoaderLog.info("DamageMeter UI injected in _enter_tree", MOD_DIR_NAME)
 
 # Hook into the _on_EntitySpawner_players_spawned function
 # This is called after players are spawned and UI is set up

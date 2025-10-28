@@ -1,6 +1,13 @@
 keys,en,de
+DAMAGEMETER_TAB_TITLE,Damage Meter,Damage Meter
 DAMAGEMETER_OPACITY,Opacity,Transparenz
+DAMAGEMETER_OPACITY_LABEL,Opacity,Transparenz
 DAMAGEMETER_NUMBER_OF_SOURCES,Number of Sources,Anzahl Schadensquellen
+DAMAGEMETER_NUMBER_OF_SOURCES_LABEL,Number of Damage Sources,Anzahl Schadensquellen
 DAMAGEMETER_SHOW_ITEM_COUNT,Show Item Count,Item-Anzahl anzeigen
+DAMAGEMETER_SHOW_ITEM_COUNT_LABEL,Show Item Count,Item-Anzahl anzeigen
 DAMAGEMETER_SHOW_DPS,Show DPS,DPS anzeigen
+DAMAGEMETER_SHOW_DPS_LABEL,Show DPS,DPS anzeigen
 DAMAGEMETER_SHOW_PERCENTAGE,Show Percentage,Prozente anzeigen
+DAMAGEMETER_SHOW_PERCENTAGE_LABEL,Show Percentage,Prozente anzeigen
+DAMAGEMETER_INFO_TEXT,Configure the Damage Meter display settings. Changes take effect immediately.,Konfiguriere die Damage Meter Anzeigeeinstellungen. Änderungen werden sofort übernommen.

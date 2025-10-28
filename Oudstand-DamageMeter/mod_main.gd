@@ -5,38 +5,53 @@ const MOD_ID := "Oudstand-DamageMeter"
 
 var config_manager = null
 
+
 func _init():
-	var mod_dir_path = ModLoaderMod.get_unpacked_dir().plus_file(MOD_DIR_NAME)
+	var mod_dir_path := ModLoaderMod.get_unpacked_dir().plus_file(MOD_DIR_NAME)
 
-	# Add translations
-	var translations_dir_path = mod_dir_path.plus_file("translations")
-	ModLoaderMod.add_translation(translations_dir_path.plus_file("DamageMeter.en.translation"))
-	ModLoaderMod.add_translation(translations_dir_path.plus_file("DamageMeter.de.translation"))
+	_load_translations(mod_dir_path)
+	_setup_autoloads(mod_dir_path)
+	_install_extensions(mod_dir_path)
 
-	# Add ConfigManager as an autoload (singleton)
-	var config_script = load(mod_dir_path.plus_file("config_manager.gd"))
-	config_manager = config_script.new()
-	config_manager.name = "DamageMeterConfig"
-	add_child(config_manager)
 
-	# Install script extensions
-	var extensions_dir_path = mod_dir_path.plus_file("extensions")
-	# Add CharmTracker as an autoload (singleton) - for DLC charm feature
-	# This tracks whether any player has charm capabilities (Flute/Romantic) to enable/disable tracking
-	var charm_tracker_script = load(extensions_dir_path.plus_file("charm_tracker.gd"))
-	var charm_tracker = charm_tracker_script.new()
-	charm_tracker.name = "DamageMeterCharmTracker"
-	add_child(charm_tracker)
+func _load_translations(mod_dir_path: String) -> void:
+	var translations_dir := mod_dir_path.plus_file("translations")
+	ModLoaderMod.add_translation(translations_dir.plus_file("DamageMeter.en.translation"))
+	ModLoaderMod.add_translation(translations_dir.plus_file("DamageMeter.de.translation"))
 
-	# Extend enemy.gd to track damage dealt by charmed enemies (DLC feature)
-	ModLoaderMod.install_script_extension(extensions_dir_path.plus_file("enemy_extension.gd"))
 
-	# Extend UI components
-	var ui_extensions_dir_path = mod_dir_path.plus_file("ui/hud")
-	ModLoaderMod.install_script_extension(ui_extensions_dir_path.plus_file("player_damage_updater.gd"))
+func _setup_autoloads(mod_dir_path: String) -> void:
+	config_manager = _create_autoload(
+		mod_dir_path.plus_file("config_manager.gd"),
+		"DamageMeterConfig"
+	)
 
-	# Extend Main.gd to handle positioning (don't extend player_ui_elements.gd - causes signal duplication)
-	ModLoaderMod.install_script_extension(ui_extensions_dir_path.plus_file("main_extension.gd"))
+	var charm_tracker := _create_autoload(
+		mod_dir_path.plus_file("extensions/charm_tracker.gd"),
+		"DamageMeterCharmTracker"
+	)
+
+	var options_injector := _create_autoload(
+		mod_dir_path.plus_file("ui/options/options_menu_injector.gd"),
+		"DamageMeterOptionsInjector"
+	)
+
+
+func _create_autoload(script_path: String, node_name: String) -> Node:
+	var script = load(script_path)
+	var instance = script.new()
+	instance.name = node_name
+	add_child(instance)
+	return instance
+
+
+func _install_extensions(mod_dir_path: String) -> void:
+	var extensions_dir := mod_dir_path.plus_file("extensions")
+	ModLoaderMod.install_script_extension(extensions_dir.plus_file("enemy_extension.gd"))
+
+	var ui_extensions_dir := mod_dir_path.plus_file("ui/hud")
+	ModLoaderMod.install_script_extension(ui_extensions_dir.plus_file("player_damage_updater.gd"))
+	ModLoaderMod.install_script_extension(ui_extensions_dir.plus_file("main_extension.gd"))
 
 func _ready():
 	# Initialize config for ModLoader (like Trade mod does)

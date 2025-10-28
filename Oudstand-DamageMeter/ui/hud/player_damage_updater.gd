@@ -59,8 +59,6 @@ func _load_config_from_manager() -> void:
 	BAR_OPACITY = _config_manager.BAR_OPACITY
 	SHOW_PERCENTAGE = _config_manager.SHOW_PERCENTAGE
 
-	ModLoaderLog.info("Loaded config from manager: TOP_K=%d, SHOW_DPS=%s, SHOW_ITEM_COUNT=%s, OPACITY=%.2f" % [TOP_K, SHOW_DPS, SHOW_ITEM_COUNT, BAR_OPACITY], MOD_NAME)
-
 func _on_config_changed() -> void:
 	# Reload config from manager
 	_load_config_from_manager()
@@ -81,11 +79,8 @@ func _ready() -> void:
 		if is_instance_valid(damage_meter_mod):
 			_config_manager = damage_meter_mod.get_node_or_null("DamageMeterConfig")
 			if is_instance_valid(_config_manager):
-				# Load config from manager
 				_load_config_from_manager()
-				# Connect to config changes
-				if _config_manager.connect("config_changed", self, "_on_config_changed") == OK:
-					ModLoaderLog.info("Connected to ConfigManager", MOD_NAME)
+				_config_manager.connect("config_changed", self, "_on_config_changed")
 			else:
 				ModLoaderLog.warning("ConfigManager not found", MOD_NAME)
 		else:
