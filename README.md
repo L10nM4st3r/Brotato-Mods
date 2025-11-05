@@ -57,13 +57,13 @@ QuickEquip lets you add or remove weapons and items anytime during a run. Perfec
 
 ## Screenshots
 
-![ModOptions Interface](screenshots/mods_tab.png)
+![ModOptions Interface](Oudstand-ModOptions/screenshots/modoptions_ui_damage_meter.png)
 *Unified "Mods" tab in Options menu*
 
 ![DamageMeter](screenshots/damagemeter_overview.png)
 *DamageMeter showing damage statistics during gameplay*
 
-![QuickEquip](screenshots/quickequip_overview.png)
+![QuickEquip](Oudstand-QuickEquip/screenshots/quickequip_ui.png)
 *QuickEquip configuration with item selection*
 
 ## Configuration
