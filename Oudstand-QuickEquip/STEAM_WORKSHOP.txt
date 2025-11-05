@@ -69,6 +69,6 @@ Quickly equip items and weapons during runs! QuickEquip lets you add or remove e
 
 [h2]Support[/h2]
 
-For bugs or feature requests, please visit the GitHub repository or leave a comment below.
+For bugs or feature requests, please visit the [url=https://github.com/Oudstand/Brotato-Mods/tree/main/Oudstand-QuickEquip]GitHub repository[/url] or leave a comment below.
 
 [b]Equip fast, experiment more! ⚡[/b]

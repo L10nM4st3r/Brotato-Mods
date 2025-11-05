@@ -27,7 +27,7 @@ After installing, go to [b]Options → Mods[/b] to configure all your installed 
 
 [h2]For Mod Developers[/h2]
 
-Want to add configuration to your mod? Check the documentation in the GitHub repository for full API reference and examples.
+Want to add configuration to your mod? Check the documentation in the [url=https://github.com/Oudstand/Brotato-Mods/tree/main/Oudstand-ModOptions]GitHub repository[/url] for full API reference and examples.
 
 [h2]Compatibility[/h2]
 

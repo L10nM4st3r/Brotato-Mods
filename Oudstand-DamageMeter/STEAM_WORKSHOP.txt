@@ -57,6 +57,6 @@ The mod works perfectly with default settings (shown above). No configuration ne
 
 [h2]Support[/h2]
 
-For bugs or feature requests, please visit the GitHub repository or leave a comment below.
+For bugs or feature requests, please visit the [url=https://github.com/Oudstand/Brotato-Mods/tree/main/Oudstand-DamageMeter]GitHub repository[/url] or leave a comment below.
 
 [b]Analyze your builds and dominate! 📊[/b]
