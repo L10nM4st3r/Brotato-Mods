@@ -200,6 +200,11 @@ func _give_items():
 	if not items_to_give is Array:
 		items_to_give = []
 
+	# Get the DLC curse function if available
+	var dlc_data = null
+	if ProgressData.is_dlc_available_and_active("abyssal_terrors"):
+		dlc_data = ProgressData.get_dlc_data("abyssal_terrors")
+
 	# --- Waffen-Logik ---
 	var all_weapons_list = ItemService.get("weapons")
 	if is_instance_valid(ItemService) and all_weapons_list != null:
@@ -222,7 +227,13 @@ func _give_items():
 			if is_instance_valid(base_weapon):
 				for _i in range(count):
 					var weapon = base_weapon.duplicate()
-					weapon.is_cursed = is_cursed
+					
+					# Apply curse if needed
+					if is_cursed and dlc_data:
+						weapon = dlc_data.curse_item(weapon, player_index, true)
+					else:
+						weapon.is_cursed = is_cursed
+					
 					var returned_weapon = RunData.add_weapon(weapon, player_index)
 
 					# Actually equip the weapon by adding it to the player entity
@@ -261,7 +272,13 @@ func _give_items():
 		if is_instance_valid(item):
 			for _i in range(count):
 				var item_copy = item.duplicate()
-				item_copy.is_cursed = is_cursed
+				
+				# Apply curse if needed
+				if is_cursed and dlc_data:
+					item_copy = dlc_data.curse_item(item_copy, player_index, true)
+				else:
+					item_copy.is_cursed = is_cursed
+				
 				RunData.add_item(item_copy, player_index)
 
 			# Track this item ID for later removal
