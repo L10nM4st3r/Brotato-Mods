@@ -384,29 +384,20 @@ func _create_item_selector_option(mod_id: String, option: Dictionary) -> Node:
 
 	# Add Item button
 	var add_button := Button.new()
-	# Use translation if help_text is a translation key, otherwise use default text
-	var button_translation_key = ""
 	var option_item_type = option.get("item_type", "item")
-	if option.has("help_text") and option.help_text.begins_with("QUICKEQUIP_"):
-		# QuickEquip mod uses translation keys
-		match option_item_type:
-			"weapon":
-				button_translation_key = "QUICKEQUIP_ADD_WEAPON"
-			"character":
-				button_translation_key = "QUICKEQUIP_ADD_ABILITY"
-			_:
-				button_translation_key = "QUICKEQUIP_ADD_ITEM"
 
-	if not button_translation_key.empty():
-		add_button.text = tr(button_translation_key)
+	# Check if mod provided custom button text (translation key)
+	if option.has("add_button_text"):
+		add_button.text = tr(option.add_button_text)
 	else:
+		# Use default text based on item type
 		match option_item_type:
 			"weapon":
-				add_button.text = "+ Add Weapon"
+				add_button.text = tr("MODOPTIONS_ADD_WEAPON")
 			"character":
-				add_button.text = "+ Add Ability"
+				add_button.text = tr("MODOPTIONS_ADD_ABILITY")
 			_:
-				add_button.text = "+ Add Item"
+				add_button.text = tr("MODOPTIONS_ADD_ITEM")
 
 	if font:
 		add_button.set("custom_fonts/font", font)
@@ -507,11 +498,11 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 
 	# Cursed checkbox
 	var cursed_check := CheckButton.new()
-	# Use translation if available
-	if option.has("help_text") and option.help_text.begins_with("QUICKEQUIP_"):
-		cursed_check.text = tr("QUICKEQUIP_CURSED")
+	# Check if mod provided custom cursed label (translation key)
+	if option.has("cursed_label_text"):
+		cursed_check.text = tr(option.cursed_label_text)
 	else:
-		cursed_check.text = "Cursed"
+		cursed_check.text = tr("MODOPTIONS_CURSED")
 	cursed_check.pressed = item_data.get("cursed", false)
 	if font:
 		cursed_check.set("custom_fonts/font", font)

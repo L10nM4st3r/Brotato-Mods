@@ -7,10 +7,8 @@ func add_starting_items_and_weapons() -> void:
 	# First, add the regular starting items from the game
 	.add_starting_items_and_weapons()
 
-	# Then add QuickEquip items if this is Wave 1 (start of run)
-	# Note: This is only called on "Try Again" / "Restart", NOT on first run from Character Selection
-	if current_wave == 1:
-		_add_quickequip_items()
+	# QuickEquip items are added in on_wave_start() instead
+	# This prevents double-adding items on restart
 
 
 func on_wave_start(timer) -> void:
@@ -20,9 +18,15 @@ func on_wave_start(timer) -> void:
 	# Add QuickEquip items on Wave 1 (this catches first run from Character Selection)
 	# Keep trying until items are added or wave > 1
 	if current_wave == 1:
+		# Reset the flag at the start of Wave 1 to allow items for new runs
+		var mod_loader = get_node_or_null("/root/ModLoader")
+		if mod_loader:
+			var quick_equip_mod = mod_loader.get_node_or_null("Oudstand-QuickEquip")
+			if quick_equip_mod:
+				quick_equip_mod.set("_items_added_this_run", false)
+
 		_add_quickequip_items()
 		# If items weren't added (options not ready), schedule retry
-		var mod_loader = get_node_or_null("/root/ModLoader")
 		if mod_loader:
 			var quick_equip_mod = mod_loader.get_node_or_null("Oudstand-QuickEquip")
 			if quick_equip_mod and not quick_equip_mod.get("_items_added_this_run"):

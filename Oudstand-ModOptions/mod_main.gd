@@ -6,7 +6,14 @@ const MOD_ID := "Oudstand-ModOptions"
 
 func _init():
 	var mod_dir_path := ModLoaderMod.get_unpacked_dir().plus_file(MOD_DIR_NAME)
+	_load_translations(mod_dir_path)
 	_setup_autoloads(mod_dir_path)
+
+
+func _load_translations(mod_dir_path: String) -> void:
+	var translations_dir := mod_dir_path.plus_file("translations")
+	ModLoaderMod.add_translation(translations_dir.plus_file("ModOptions.en.translation"))
+	ModLoaderMod.add_translation(translations_dir.plus_file("ModOptions.de.translation"))
 
 
 func _setup_autoloads(mod_dir_path: String) -> void:
