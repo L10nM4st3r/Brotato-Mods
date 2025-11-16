@@ -386,17 +386,27 @@ func _create_item_selector_option(mod_id: String, option: Dictionary) -> Node:
 	var add_button := Button.new()
 	# Use translation if help_text is a translation key, otherwise use default text
 	var button_translation_key = ""
+	var option_item_type = option.get("item_type", "item")
 	if option.has("help_text") and option.help_text.begins_with("QUICKEQUIP_"):
 		# QuickEquip mod uses translation keys
-		if option.get("item_type", "item") == "weapon":
-			button_translation_key = "QUICKEQUIP_ADD_WEAPON"
-		else:
-			button_translation_key = "QUICKEQUIP_ADD_ITEM"
+		match option_item_type:
+			"weapon":
+				button_translation_key = "QUICKEQUIP_ADD_WEAPON"
+			"character":
+				button_translation_key = "QUICKEQUIP_ADD_ABILITY"
+			_:
+				button_translation_key = "QUICKEQUIP_ADD_ITEM"
 
 	if not button_translation_key.empty():
 		add_button.text = tr(button_translation_key)
 	else:
-		add_button.text = "+ Add %s" % ("Weapon" if option.get("item_type", "item") == "weapon" else "Item")
+		match option_item_type:
+			"weapon":
+				add_button.text = "+ Add Weapon"
+			"character":
+				add_button.text = "+ Add Ability"
+			_:
+				add_button.text = "+ Add Item"
 
 	if font:
 		add_button.set("custom_fonts/font", font)
@@ -450,7 +460,6 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 			item_dropdown.add_item(item.display_name, i)
 		if item.base_name == item_data.get("base_name", ""):
 			selected_item_index = i
-
 	item_dropdown.selected = selected_item_index
 	item_dropdown.connect("item_selected", self, "_on_item_dropdown_changed", [container, mod_id, option, row])
 	row.add_child(item_dropdown)
@@ -489,6 +498,11 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 	if font:
 		count_spinbox.get_line_edit().set("custom_fonts/font", font)
 	count_spinbox.connect("value_changed", self, "_on_item_row_changed", [container, mod_id, option])
+	var show_count = option.get("show_count", true)
+	count_spinbox.editable = show_count
+	count_spinbox.visible = show_count
+	if not show_count:
+		count_spinbox.value = 1
 	row.add_child(count_spinbox)
 
 	# Cursed checkbox
@@ -502,6 +516,11 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 	if font:
 		cursed_check.set("custom_fonts/font", font)
 	cursed_check.connect("toggled", self, "_on_item_row_changed", [container, mod_id, option])
+	var show_cursed = option.get("show_cursed", true)
+	cursed_check.disabled = not show_cursed
+	cursed_check.visible = show_cursed
+	if not show_cursed:
+		cursed_check.pressed = false
 	row.add_child(cursed_check)
 
 	# Remove button
@@ -522,7 +541,14 @@ func _get_available_items(item_type: String) -> Array:
 	if not is_instance_valid(ItemService):
 		return result
 
-	var source_list = ItemService.weapons if item_type == "weapon" else ItemService.items
+	var source_list = []
+	match item_type:
+		"weapon":
+			source_list = ItemService.weapons
+		"character":
+			source_list = ItemService.characters
+		_:
+			source_list = ItemService.items
 
 	if not source_list:
 		return result
@@ -563,7 +589,14 @@ func _get_unique_base_items(item_type: String) -> Array:
 	if not is_instance_valid(ItemService):
 		return []
 
-	var source_list = ItemService.weapons if item_type == "weapon" else ItemService.items
+	var source_list = []
+	match item_type:
+		"weapon":
+			source_list = ItemService.weapons
+		"character":
+			source_list = ItemService.characters
+		_:
+			source_list = ItemService.items
 	if not source_list:
 		return []
 
@@ -660,7 +693,10 @@ func _populate_tier_dropdown(tier_dropdown: OptionButton, item_type: String, bas
 	var available_tiers = _get_available_tiers(item_type, base_name)
 	if available_tiers.empty():
 		# Fallback: show all tiers if none found
-		available_tiers = [0, 1, 2, 3]
+		if item_type == "character":
+			available_tiers = [0]
+		else:
+			available_tiers = [0, 1, 2, 3]
 
 	var tier_names = ["I", "II", "III", "IV"]
 	var selected_index = 0

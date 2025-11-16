@@ -14,6 +14,7 @@ A convenient mod for Brotato that lets you quickly equip items and weapons durin
   - Set quantity for each item/weapon
   - Mark items as cursed
   - Remove equipment anytime
+- **Character Ability Mixing**: Combine passive abilities from any unlocked characters to create hybrid test builds
 - **Multilingual**: Built-in English and German translations
 - **Clean UI**: Integrated with ModOptions for consistent interface
 
@@ -57,6 +58,13 @@ Install via Steam Workshop or download from the repository.
 - Optionally mark as cursed
 - Changes apply immediately
 
+### Adding Character Abilities
+- Scroll down to **Character Abilities**
+- Click **+ Add Ability**
+- Pick any character whose passive kit you want to borrow
+- Add as many different abilities as you like (duplicates are ignored)
+- Passives are applied instantly, letting you create hybrid characters on the fly
+- Added abilities appear in your inventory like normal items (complete with tooltips), so you can always review what is active
 ### Removing Equipment
 - Click the **X** button next to any item/weapon
 - It will be removed from your inventory instantly if you're in a run
@@ -113,6 +121,7 @@ The game will automatically use the appropriate language based on your system se
 
 - Only works with vanilla items and weapons (modded items depend on mod compatibility)
 - Equipment is not added to the shop or normal loot pools - it's directly equipped
+- Borrowed character abilities only include passive/stat effects. Unique hard-coded behaviors (e.g., Renegade shop logic, elite spawn tweaks from Jack/Ogre) still follow your currently selected base character.
 
 ## Credits
 

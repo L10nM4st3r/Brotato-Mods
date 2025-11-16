@@ -10,6 +10,7 @@ Quickly equip items and weapons during runs! QuickEquip lets you add or remove e
 [*][b]Smart Item Selection[/b] - Deduplicated lists with item icons and separate tier dropdowns
 [*][b]Dynamic Tier Selection[/b] - Only shows available tiers for each item
 [*][b]Full Control[/b] - Set quantity and mark items as cursed
+[*][b]Character Ability Mixing[/b] - Borrow passive kits from any characters to create hybrids
 [*][b]Multilingual[/b] - Built-in English and German translations
 [*][b]Clean UI[/b] - Integrated with ModOptions for consistent interface
 [/list]
@@ -28,6 +29,13 @@ Quickly equip items and weapons during runs! QuickEquip lets you add or remove e
 [*]Set quantity
 [*]Optionally mark as cursed
 [*]Changes apply immediately if you're in a run!
+[/list]
+
+[h3]Adding Character Abilities[/h3]
+[list]
+[*]Scroll down to [b]+ Add Ability[/b]
+[*]Pick any character whose passives you want to copy
+[*]Abilities stack instantly with your current character (duplicates are ignored)
 [/list]
 
 [h3]Removing Equipment[/h3]
