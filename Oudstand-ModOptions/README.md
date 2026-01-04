@@ -20,7 +20,7 @@ A powerful and flexible configuration framework for Brotato mods. ModOptions pro
 
 ## Installation
 
-Install via Steam Workshop or download from the repository.
+Install via [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3598984651) or download from the repository.
 
 ## Screenshots
 
@@ -30,7 +30,7 @@ Install via Steam Workshop or download from the repository.
 ![ModOptions Interface QuickEquip](screenshots/modoptions_ui_quick_equip.png)
 *Unified "Mods" tab showing configuration options for Quick Equip mod*
 
-![ModOptions Interface QuickEquip](screenshots/modoptions_ui_quick_equip_characters.png.png.png)
+![ModOptions Interface QuickEquip](screenshots/modoptions_ui_quick_equip_characters.png)
 *Unified "Mods" tab showing configuration options for Quick Equip mod*
 
 ## For Mod Developers

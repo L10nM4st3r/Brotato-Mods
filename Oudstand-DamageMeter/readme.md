@@ -20,7 +20,7 @@ A comprehensive damage tracking mod for Brotato that displays real-time damage s
 
 ## Installation
 
-Install via Steam Workshop or download from the repository.
+Install via [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3578347192) or download from the repository.
 
 **Optional:**
 - **ModOptions** (Oudstand-ModOptions) - Enables in-game configuration UI

@@ -20,7 +20,7 @@ A convenient mod for Brotato that lets you quickly equip items and weapons durin
 
 ## Installation
 
-Install via Steam Workshop or download from the repository.
+Install via [Steam Workshop](https://steamcommunity.com/sharedfiles/filedetails/?id=3598984964) or download from the repository.
 
 **Requirements:**
 - **ModOptions** (Oudstand-ModOptions) - Required for the configuration interface
