@@ -4,7 +4,7 @@ const COMPACT_SEPARATION: int = 2
 const MOD_DIR_NAME := "Oudstand-DamageMeter"
 
 var _damage_meters_injected: bool = false
-var _pocket_factory_turret_spawns: Array = [0, 0, 0, 0]  # Track Pocket Factory turret spawns per player
+var _pocket_factory_turret_spawns: Array = [0, 0, 0, 0] # Track Pocket Factory turret spawns per player
 
 # Use _enter_tree instead of _ready to inject nodes early
 func _enter_tree() -> void:
@@ -72,7 +72,7 @@ func _setup_damage_meter_positioning() -> void:
 			dmg_container.set_base_alpha(1.0)
 
 		# Position based on player layout (top/bottom)
-		var is_bottom_player: bool = i > 1  # P3 and P4 are bottom players
+		var is_bottom_player: bool = i > 1 # P3 and P4 are bottom players
 
 		# Reorder: bottom players show damage meter first, top players show it last
 		if is_bottom_player:
@@ -97,7 +97,7 @@ func _on_neutral_died(neutral: Neutral, args: Entity.DieArgs) -> void:
 	if not _cleaning_up:
 		for player in _get_shuffled_live_players():
 			var player_index = player.player_index
-			var tree_turrets_count = RunData.get_player_effect("tree_turrets", player_index)
+			var tree_turrets_count = RunData.get_player_effect(Keys.generate_hash("tree_turrets"), player_index)
 			if tree_turrets_count > 0:
 				_pocket_factory_turret_spawns[player_index] += tree_turrets_count
 
