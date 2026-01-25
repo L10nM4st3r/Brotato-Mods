@@ -1,5 +1,6 @@
-class_name QuickEquipItemTracker
 extends Reference
+
+# QuickEquip item tracker (loaded dynamically, no class_name needed)
 
 # Tracks given equipment and configs to compute diffs per player
 

@@ -1,5 +1,6 @@
-class_name QuickEquipUtils
 extends Reference
+
+# QuickEquip utility functions (loaded dynamically, no class_name needed)
 
 # Utility functions for QuickEquip mod
 

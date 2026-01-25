@@ -1,5 +1,6 @@
-class_name QuickEquipItemSyncManager
 extends Reference
+
+# QuickEquip item sync manager (loaded dynamically, no class_name needed)
 
 # Manages syncing items/weapons/abilities during runtime
 

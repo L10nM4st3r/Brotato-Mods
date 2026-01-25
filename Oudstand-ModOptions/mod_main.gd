@@ -24,14 +24,13 @@ func _install_extensions(mod_dir_path: String) -> void:
 
 
 func _setup_autoloads(mod_dir_path: String) -> void:
-	# Register the ModOptions manager as a global autoload
-	# This makes it accessible via "ModOptions" from any mod
+	# Register the ModOptions manager
 	var _mod_options_manager := _create_autoload(
 		mod_dir_path.plus_file("mod_options_manager.gd"),
 		"ModOptions"
 	)
 
-	# Register the options injector to dynamically add tabs to the options menu
+	# Register the options injector
 	var _options_injector := _create_autoload(
 		mod_dir_path.plus_file("ui/options_injector.gd"),
 		"ModOptionsInjector"
@@ -44,23 +43,29 @@ func _create_autoload(script_path: String, node_name: String) -> Node:
 	instance.name = node_name
 	add_child(instance)
 	return instance
-	
-	
+
+
+# Workaround for ModLoader crash: The game's _global_script_classes contains
+# entries for test files (e.g., pd_enemy.gd) that don't exist in production.
+# When ModLoader installs extensions, it tries to reload these and crashes.
+# This function removes broken entries using ResourceLoader.exists().
 func _fix_broken_script_classes() -> void:
 	var global_classes = ProjectSettings.get_setting("_global_script_classes")
-	if not global_classes is Array:
+	if not global_classes is Array or global_classes.empty():
 		return
 
-	var file_checker = File.new()
 	var clean_classes = []
-	var has_invalid_classes = false
+	var removed_count = 0
 
 	for class_entry in global_classes:
-		if "path" in class_entry and not file_checker.file_exists(class_entry.path):
-			has_invalid_classes = true
-			print("[Oudstand-ModOptions] Removing broken global class entry: ", class_entry)
+		if class_entry is Dictionary and class_entry.has("path"):
+			if ResourceLoader.exists(class_entry.path):
+				clean_classes.append(class_entry)
+			else:
+				removed_count += 1
 		else:
 			clean_classes.append(class_entry)
 
-	if has_invalid_classes:
+	if removed_count > 0:
 		ProjectSettings.set_setting("_global_script_classes", clean_classes)
+		ModLoaderLog.info("Removed %d broken script class entries (game test files)" % removed_count, MOD_ID)
