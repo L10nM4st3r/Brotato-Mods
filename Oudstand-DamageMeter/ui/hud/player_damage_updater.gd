@@ -108,7 +108,7 @@ func _ready() -> void:
 				active_displays.append(container)
 				# Apply loaded settings
 				container.set_animation_settings(ANIMATION_SPEED, BAR_OPACITY, COMPACT_MODE)
-				ModLoaderLog.debug("Set settings for P%d: BAR_OPACITY=%.2f" % [i+1, BAR_OPACITY], MOD_NAME)
+				ModLoaderLog.debug("Set settings for P%d: BAR_OPACITY=%.2f" % [i + 1, BAR_OPACITY], MOD_NAME)
 			else:
 				container.visible = false
 		else:
@@ -161,21 +161,26 @@ func _snapshot_wave_start(player_count: int) -> void:
 			continue
 
 		var item_map = {}
-		for item_id in RunData.tracked_item_effects[i].keys():
-			var val = RunData.tracked_item_effects[i].get(item_id, 0)
+		for key in RunData.tracked_item_effects[i].keys():
+			var val = RunData.tracked_item_effects[i].get(key, 0)
 			var current_val = int(val) if typeof(val) != TYPE_ARRAY else 0
+			var item_id_str = str(key)
+
+			# Try to resolve hash to string for logic check
+			if key is int and Keys.hash_to_string.has(key):
+				item_id_str = Keys.hash_to_string[key]
 
 			# For builder turret items, the game resets the counter between waves
 			# We reset both the snapshot AND the actual value to ensure sync
-			if item_id.begins_with("item_builder_turret_"):
-				RunData.tracked_item_effects[i][item_id] = 0
-				item_map[item_id] = 0
+			if item_id_str.begins_with("item_builder_turret_"):
+				RunData.tracked_item_effects[i][key] = 0
+				item_map[key] = 0
 			# For charmed enemies damage, also reset between waves
-			elif item_id == "charmed_enemies_damage":
-				RunData.tracked_item_effects[i][item_id] = 0
-				item_map[item_id] = 0
+			elif item_id_str == "charmed_enemies_damage":
+				RunData.tracked_item_effects[i][key] = 0
+				item_map[key] = 0
 			else:
-				item_map[item_id] = current_val
+				item_map[key] = current_val
 
 		wave_start_item_damages[i] = item_map
 
@@ -231,11 +236,11 @@ func _get_spawned_items_for_weapon(weapon: Object) -> Array:
 	if weapon.name == "WEAPON_WRENCH":
 		var turret_id = _get_turret_id_for_tier(weapon)
 		if turret_id:
-			var turret = ItemService.get_item_from_id(turret_id)
+			var turret = ItemService.get_item_from_id(Keys.generate_hash(turret_id))
 			if is_instance_valid(turret):
 				spawned.append(turret)
 	elif weapon.name == "WEAPON_SCREWDRIVER":
-		var landmine = ItemService.get_item_from_id("item_landmines")
+		var landmine = ItemService.get_item_from_id(Keys.generate_hash("item_landmines"))
 		if is_instance_valid(landmine):
 			spawned.append(landmine)
 	
@@ -248,7 +253,7 @@ func _get_spawned_items_for_item(item: Object) -> Array:
 		return spawned
 
 	if item.my_id == "item_pocket_factory":
-		var turret = ItemService.get_item_from_id("item_turret")
+		var turret = ItemService.get_item_from_id(Keys.generate_hash("item_turret"))
 		if is_instance_valid(turret):
 			spawned.append(turret)
 
@@ -307,16 +312,24 @@ func _get_source_damage(source, player_index: int) -> int:
 
 	var item_id = source.my_id
 	var effects = RunData.tracked_item_effects[player_index]
+	var key = -1
 
-	if not effects.has(item_id):
+	# Try hash key first (standard Vanilla/Beta behavior)
+	var hash_key = Keys.generate_hash(item_id)
+	if effects.has(hash_key):
+		key = hash_key
+	# Fallback to string key (for custom tracking like charmed_enemies_damage)
+	elif effects.has(item_id):
+		key = item_id
+	else:
 		return 0
 
-	var current_val = effects.get(item_id, 0)
+	var current_val = effects.get(key, 0)
 
 	if typeof(current_val) == TYPE_ARRAY:
 		return 0
 
-	var start_val = wave_start_item_damages.get(player_index, {}).get(item_id, 0)
+	var start_val = wave_start_item_damages.get(player_index, {}).get(key, 0)
 	var damage_diff = int(current_val - start_val)
 
 	return max(0, damage_diff) as int
@@ -435,7 +448,7 @@ func _apply_spawned_count_overrides(groups: Dictionary, player_index: int) -> vo
 	if not is_instance_valid(main) or not main.has_method("get_pocket_factory_spawns"):
 		return
 
-	var has_pf_item = RunData.get_nb_item("item_pocket_factory", player_index) > 0
+	var has_pf_item = RunData.get_nb_item(Keys.item_pocket_factory_hash, player_index) > 0
 	if not has_pf_item:
 		return
 
@@ -444,10 +457,10 @@ func _apply_spawned_count_overrides(groups: Dictionary, player_index: int) -> vo
 		return
 
 	# Find common turret group and add Pocket Factory spawns to count
-	var turret_key = "item_turret_t0"  # Common turret (items don't include cursed status in key)
+	var turret_key = "item_turret_t0" # Common turret (items don't include cursed status in key)
 	if groups.has(turret_key):
 		var base_count = groups[turret_key].count
-		var non_pf_sources = max(0, base_count - 1)  # subtract Pocket Factory placeholder if present
+		var non_pf_sources = max(0, base_count - 1) # subtract Pocket Factory placeholder if present
 		groups[turret_key].count = pf_spawns + non_pf_sources
 
 func _get_top_sources(player_index: int) -> Array:

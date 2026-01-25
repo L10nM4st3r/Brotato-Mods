@@ -32,7 +32,7 @@ func on_wave_start(timer) -> void:
 
 
 func _retry_add_items() -> void:
-	yield(get_tree().create_timer(0.3), "timeout")
+	yield (get_tree().create_timer(0.3), "timeout")
 	if current_wave == 1:
 		_add_quickequip_items()
 
@@ -61,7 +61,7 @@ func _add_quickequip_items() -> void:
 	# Check if QuickEquip options are actually registered
 	if not quick_equip_mod.get("options_registered"):
 		ModLoaderLog.warning("QuickEquip: Options not yet registered, skipping item addition", "Oudstand-QuickEquip")
-		quick_equip_mod.set("_items_added_this_run", false)  # Reset flag for retry
+		quick_equip_mod.set("_items_added_this_run", false) # Reset flag for retry
 		return
 
 	# Get DLC data for curse functionality
@@ -105,7 +105,6 @@ func _add_quickequip_items() -> void:
 
 
 func _add_items_for_player(player_index: int, weapons_to_give: Array, items_to_give: Array, abilities_to_apply: Array, dlc_data, quick_equip_mod) -> void:
-
 	# Add weapons and track them
 	for weapon_config in weapons_to_give:
 		if not weapon_config is Dictionary:
@@ -117,7 +116,7 @@ func _add_items_for_player(player_index: int, weapons_to_give: Array, items_to_g
 		var is_cursed = bool(weapon_config.get("cursed", false))
 
 		for _i in range(count):
-			var weapon = ItemService.get_element(ItemService.weapons, weapon_id)
+			var weapon = ItemService.get_element_safe(ItemService.weapons, weapon_id)
 			if not is_instance_valid(weapon):
 				continue
 
@@ -145,7 +144,7 @@ func _add_items_for_player(player_index: int, weapons_to_give: Array, items_to_g
 		var is_cursed = bool(item_config.get("cursed", false))
 
 		for _i in range(count):
-			var item = ItemService.get_element(ItemService.items, item_id)
+			var item = ItemService.get_element_safe(ItemService.items, item_id)
 			if not is_instance_valid(item):
 				continue
 
@@ -171,7 +170,7 @@ func _add_items_for_player(player_index: int, weapons_to_give: Array, items_to_g
 		var count = int(ability_config.get("count", 1))
 
 		for _i in range(count):
-			var character_data = ItemService.get_element(ItemService.characters, character_id)
+			var character_data = ItemService.get_element_safe(ItemService.characters, character_id)
 			if not is_instance_valid(character_data):
 				continue
 

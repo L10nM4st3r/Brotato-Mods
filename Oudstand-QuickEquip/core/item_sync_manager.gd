@@ -7,7 +7,7 @@ const MOD_ID := "Oudstand-QuickEquip"
 const Utils = preload("res://mods-unpacked/Oudstand-QuickEquip/core/utils.gd")
 
 var _tracker
-var _owner_node  # Reference to the mod_main node for accessing get_tree()
+var _owner_node # Reference to the mod_main node for accessing get_tree()
 
 
 func _init(tracker, owner_node):
@@ -32,7 +32,7 @@ func sync_items(weapons_config: Array, items_config: Array, abilities_config: Ar
 
 	# UI Refresh: Force player entity and stats update
 	if _owner_node and _owner_node.get_tree():
-		yield(_owner_node.get_tree(), "idle_frame")
+		yield (_owner_node.get_tree(), "idle_frame")
 	else:
 		return
 
@@ -196,7 +196,7 @@ func _add_item_instances(item_id: String, is_cursed: bool, count: int, dlc_data,
 		ModLoaderLog.warning("Cannot add item - invalid player_index %d (player_count: %d)" % [player_index, RunData.get_player_count() if is_instance_valid(RunData) else -1], MOD_ID)
 		return
 
-	var item = ItemService.get_element(ItemService.items, item_id)
+	var item = ItemService.get_element_safe(ItemService.items, item_id)
 	if not is_instance_valid(item):
 		ModLoaderLog.error("Failed to create item: %s" % item_id, MOD_ID)
 		return
@@ -222,7 +222,7 @@ func _add_character_abilities(character_id: String, count: int, player_index: in
 		ModLoaderLog.warning("Cannot add ability - invalid player_index %d (player_count: %d)" % [player_index, RunData.get_player_count() if is_instance_valid(RunData) else -1], MOD_ID)
 		return
 
-	var character_data = ItemService.get_element(ItemService.characters, character_id)
+	var character_data = ItemService.get_element_safe(ItemService.characters, character_id)
 	if not is_instance_valid(character_data):
 		ModLoaderLog.error("Character ability not found: %s" % character_id, MOD_ID)
 		return

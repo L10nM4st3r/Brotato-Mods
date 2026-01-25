@@ -5,6 +5,7 @@ const MOD_ID := "Oudstand-ModOptions"
 
 
 func _init():
+	_fix_broken_script_classes()
 	var mod_dir_path := ModLoaderMod.get_unpacked_dir().plus_file(MOD_DIR_NAME)
 	_load_translations(mod_dir_path)
 	_install_extensions(mod_dir_path)
@@ -43,3 +44,23 @@ func _create_autoload(script_path: String, node_name: String) -> Node:
 	instance.name = node_name
 	add_child(instance)
 	return instance
+	
+	
+func _fix_broken_script_classes() -> void:
+	var global_classes = ProjectSettings.get_setting("_global_script_classes")
+	if not global_classes is Array:
+		return
+
+	var file_checker = File.new()
+	var clean_classes = []
+	var has_invalid_classes = false
+
+	for class_entry in global_classes:
+		if "path" in class_entry and not file_checker.file_exists(class_entry.path):
+			has_invalid_classes = true
+			print("[Oudstand-ModOptions] Removing broken global class entry: ", class_entry)
+		else:
+			clean_classes.append(class_entry)
+
+	if has_invalid_classes:
+		ProjectSettings.set_setting("_global_script_classes", clean_classes)

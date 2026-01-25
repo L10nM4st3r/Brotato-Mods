@@ -5,7 +5,7 @@ extends "res://ui/menus/global/focus_emulator.gd"
 # 2. Focus restoration when controls are deleted dynamically
 
 # Cache for scroll position to avoid reading stale values from ScrollContainer
-var _deferred_scroll_cache = {}  # popup -> scroll_position
+var _deferred_scroll_cache = {} # popup -> scroll_position
 
 func _process(_delta: float) -> void:
 	_validate_focus_references()
@@ -117,38 +117,65 @@ func _scroll_to_index(popup: PopupMenu, item_index: int) -> void:
 	if item_count == 0:
 		return
 
-	var item_height = 64.0  # 60px icon + 4px padding
-	var viewport_height = scroll_container.rect_size.y
-	var actual_scroll = scroll_container.scroll_vertical
+	var item_height = 64.0 # 60px icon + 4px padding
+	
+	# Try to be smart about height if possible, but keep fallback
+	if scroll_container.get_child_count() > 0:
+		var content = scroll_container.get_child(0)
+		if content is Control and content.rect_size.y > 0:
+			item_height = content.rect_size.y / float(item_count)
+	
+	if item_height <= 1.0:
+		item_height = 64.0
 
-	var current_scroll
-	if _deferred_scroll_cache.has(popup):
-		current_scroll = _deferred_scroll_cache[popup]
-	else:
-		current_scroll = actual_scroll
-		_deferred_scroll_cache[popup] = current_scroll
+	var viewport_height = scroll_container.rect_size.y
+	
+	# Fix for Fullscreen/Oversized Container:
+	# If the container extends physically below the screen bottom, the bottom items are hidden.
+	# We calculate the "effective" visible height by subtracting the overflow.
+	var scroll_global_rect = scroll_container.get_global_rect()
+	var screen_rect = get_viewport().get_visible_rect()
+	
+	# Check where container ends vs screen ends
+	var container_phys_bottom = scroll_global_rect.position.y + viewport_height
+	var screen_bottom = screen_rect.size.y
+	
+	if container_phys_bottom > screen_bottom:
+		var overflow = container_phys_bottom - screen_bottom
+		# Reduce effective height by overflow + safety margin
+		viewport_height -= (overflow + 32.0)
+		
+		# Safety floor to prevent collapsing logic in weird states
+		if viewport_height < 64.0:
+			viewport_height = 64.0
+
+	# Always read actual scroll from container
+	var current_scroll = scroll_container.scroll_vertical
 
 	var item_top = item_index * item_height
 	var item_bottom = item_top + item_height
 	var visible_top = current_scroll
 	var visible_bottom = current_scroll + viewport_height
 
-	var item_is_fully_visible = item_top >= visible_top and item_bottom <= visible_bottom
-
-	if item_is_fully_visible:
+	# If item is fully visible, do nothing
+	if item_top >= visible_top and item_bottom <= visible_bottom:
 		return
 
-	var new_scroll
-	if item_bottom <= visible_top:
+	var new_scroll = current_scroll
+	
+	# Simple standard scrolling logic
+	if item_top < visible_top:
+		# Scroll Up
 		if item_index <= 2:
 			new_scroll = 0.0
 		else:
 			new_scroll = item_top
-	else:
+	elif item_bottom > visible_bottom:
+		# Scroll Down
 		new_scroll = item_bottom - viewport_height
 
-	scroll_container.scroll_vertical = new_scroll
-	_deferred_scroll_cache[popup] = new_scroll
+	if new_scroll != current_scroll:
+		scroll_container.scroll_vertical = new_scroll
 
 
 # Recursively find ScrollContainer
