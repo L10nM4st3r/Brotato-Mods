@@ -111,73 +111,6 @@ func _add_mod_header(vbox: VBoxContainer, title: String) -> void:
 	vbox.add_child(header)
 
 
-# Create a complete options tab for a mod (DEPRECATED - kept for compatibility)
-# Returns a ScrollContainer with all the options
-func create_options_tab(mod_id: String, config: Dictionary) -> ScrollContainer:
-	var scroll_container := ScrollContainer.new()
-	scroll_container.name = "%s_Container" % mod_id
-	scroll_container.anchor_right = 1.0
-	scroll_container.anchor_bottom = 1.0
-	scroll_container.margin_top = 20.0
-	scroll_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	scroll_container.follow_focus = true
-	scroll_container.scroll_horizontal_enabled = false
-
-	var vbox := VBoxContainer.new()
-	vbox.name = "%sContainer" % mod_id
-	vbox.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	vbox.set("custom_constants/separation", 15)
-	vbox.alignment = BoxContainer.ALIGN_CENTER
-
-	scroll_container.add_child(vbox)
-
-	# Create controls for each option
-	for option in config.options:
-		# Skip hidden options (ones with empty labels)
-		if not option.has("label") or option.label == "":
-			continue
-
-		var control: Node = null
-
-		match option.type:
-			"slider":
-				control = _create_slider_option(mod_id, option)
-			"toggle":
-				control = _create_toggle_option(mod_id, option)
-			"dropdown":
-				control = _create_dropdown_option(mod_id, option)
-			"text":
-				control = _create_text_option(mod_id, option)
-			"item_selector":
-				control = _create_item_selector_option(mod_id, option)
-
-		if control:
-			vbox.add_child(control)
-
-	# Add separator and info text at the bottom if present
-	if config.has("info_text"):
-		var separator := HSeparator.new()
-		vbox.add_child(separator)
-
-		var info_label := Label.new()
-		info_label.text = tr(config.info_text)
-		info_label.align = Label.ALIGN_CENTER
-		info_label.valign = Label.VALIGN_CENTER
-		info_label.autowrap = true
-		info_label.modulate = Color(0.6, 0.6, 0.6)
-		# Set font size to 24
-		var font: DynamicFont = load(FONT_PATH)
-		if font:
-			var custom_font = font.duplicate()
-			custom_font.size = 24
-			info_label.set("custom_fonts/font", custom_font)
-		vbox.add_child(info_label)
-
-	return scroll_container
-
-
 # Create a slider control
 func _create_slider_option(mod_id: String, option: Dictionary) -> Node:
 	var slider_scene: PackedScene = load(SLIDER_SCENE)
@@ -458,7 +391,7 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 
 	# Populate dropdown with unique items and icons
 	var selected_item_index = 0
-	var icon_size = Vector2(60, 60)  # Fixed icon size for consistency
+	var icon_size = Vector2(60, 60) # Fixed icon size for consistency
 
 	for i in range(unique_items.size()):
 		var item = unique_items[i]
@@ -874,7 +807,7 @@ func _on_item_dropdown_changed(selected_index: int, container: VBoxContainer, mo
 	# Update tier dropdown with available tiers for the new item
 	var item_type = option.get("item_type", "item")
 	var available_tiers = _get_available_tiers(item_type, base_name)
-	_populate_tier_dropdown(tier_dropdown, item_type, base_name, 0)  # Default to first available tier
+	_populate_tier_dropdown(tier_dropdown, item_type, base_name, 0) # Default to first available tier
 
 	# Show/hide tier dropdown based on available tiers
 	if available_tiers.size() > 1:
