@@ -20,6 +20,7 @@ var SHOW_DPS: bool = false
 var BAR_OPACITY: float = 1.0
 var SHOW_PERCENTAGE: bool = true
 var HIDE_TOTAL_BAR_SINGLEPLAYER: bool = false
+var UNGROUP_WEAPONS: bool = false
 
 onready var _hud: Control = get_tree().get_current_scene().get_node("UI/HUD")
 
@@ -74,6 +75,7 @@ func _load_config() -> void:
 	BAR_OPACITY = mod_options.get_value("DamageMeter", "opacity")
 	SHOW_PERCENTAGE = mod_options.get_value("DamageMeter", "show_percentage")
 	HIDE_TOTAL_BAR_SINGLEPLAYER = mod_options.get_value("DamageMeter", "hide_total_bar_singleplayer")
+	UNGROUP_WEAPONS = mod_options.get_value("DamageMeter", "ungroup_weapons")
 
 func _on_config_changed(_mod_id: String, _option_id: String, _new_value) -> void:
 	# Reload config from ModOptions
@@ -376,12 +378,13 @@ func _create_group_key(source) -> String:
 	var tier = source.tier if "tier" in source else -1
 	var cursed = source.is_cursed if "is_cursed" in source else false
 
-	# For items, ignore cursed status (damage is tracked together by the game)
-	# For weapons, keep cursed status (damage is tracked per weapon instance)
 	var is_weapon = "dmg_dealt_last_wave" in source
 
 	if is_weapon:
-		return "%s_t%d_c%s" % [base, tier, cursed]
+		if UNGROUP_WEAPONS:
+			return "%s_t%d_c%s_%d" % [base, tier, cursed, source.get_instance_id()]
+		else:
+			return "%s_t%d_c%s" % [base, tier, cursed]
 	else:
 		return "%s_t%d" % [base, tier]
 

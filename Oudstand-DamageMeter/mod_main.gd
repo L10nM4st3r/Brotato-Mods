@@ -85,6 +85,12 @@ func _register_mod_options() -> void:
 				"id": "hide_total_bar_singleplayer",
 				"label": "DAMAGEMETER_HIDE_TOTAL_BAR_SINGLEPLAYER_LABEL",
 				"default": false
+			},
+			{
+				"type": "toggle",
+				"id": "ungroup_weapons",
+				"label": "DAMAGEMETER_UNGROUP_WEAPONS_LABEL",
+				"default": false
 			}
 		],
 		"info_text": "DAMAGEMETER_INFO_TEXT"
