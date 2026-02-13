@@ -163,7 +163,12 @@ func _snapshot_wave_start(player_count: int) -> void:
 		var item_map = {}
 		for key in RunData.tracked_item_effects[i].keys():
 			var val = RunData.tracked_item_effects[i].get(key, 0)
-			var current_val = int(val) if typeof(val) != TYPE_ARRAY else 0
+			var current_val = 0
+			if typeof(val) == TYPE_ARRAY:
+				# For pet items with array tracking, snapshot the damage values
+				current_val = _extract_damage_from_array(val, key)
+			else:
+				current_val = int(val)
 			var item_id_str = str(key)
 
 			# Try to resolve hash to string for logic check
@@ -291,7 +296,8 @@ func _is_damage_tracking_item(source) -> bool:
 	if not "tracking_text" in source:
 		return false
 
-	return source.tracking_text == "DAMAGE_DEALT"
+	# Accept both standard damage tracking and explosion damage tracking (e.g. Bonk Dog)
+	return source.tracking_text == "DAMAGE_DEALT" or source.tracking_text == "EXPLOSION_DAMAGE_DEALT"
 
 func _get_source_damage(source, player_index: int) -> int:
 	# Allow both Objects and Dictionaries
@@ -325,14 +331,41 @@ func _get_source_damage(source, player_index: int) -> int:
 		return 0
 
 	var current_val = effects.get(key, 0)
+	var resolved_val = 0
 
 	if typeof(current_val) == TYPE_ARRAY:
-		return 0
+		# Pet items with array tracking: extract damage values
+		resolved_val = _extract_damage_from_array(current_val, key)
+	else:
+		resolved_val = int(current_val)
 
 	var start_val = wave_start_item_damages.get(player_index, {}).get(key, 0)
-	var damage_diff = int(current_val - start_val)
+	var damage_diff = int(resolved_val - start_val)
 
 	return max(0, damage_diff) as int
+
+# Extract total damage from array-tracked pet items
+# Bonk Dog: [explosion_damage, melee_damage] → sum both (both are damage)
+# Bot-O-Mine: [projectile_damage, landmine_count] → only index 0 (index 1 is a count, not damage)
+func _extract_damage_from_array(arr: Array, key) -> int:
+	if arr.empty():
+		return 0
+
+	# Check if this is item_bonk_dog (both indices are damage values)
+	var item_id_str = ""
+	if key is int and Keys.hash_to_string.has(key):
+		item_id_str = Keys.hash_to_string[key]
+
+	if item_id_str == "item_bonk_dog":
+		# Sum all damage indices (index 0 = explosion, index 1 = melee hits)
+		var total = 0
+		for val in arr:
+			total += int(val)
+		return total
+	else:
+		# Default: only use index 0 (primary damage value)
+		return int(arr[0])
+
 
 func _create_group_key(source) -> String:
 	# Allow both Objects and Dictionaries

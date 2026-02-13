@@ -109,6 +109,7 @@ func _create_autoload(script_path: String, node_name: String) -> Node:
 func _install_extensions(mod_dir_path: String) -> void:
 	var extensions_dir := mod_dir_path.plus_file("extensions")
 	ModLoaderMod.install_script_extension(extensions_dir.plus_file("enemy_extension.gd"))
+	ModLoaderMod.install_script_extension(extensions_dir.plus_file("landmine_extension.gd"))
 
 	var ui_extensions_dir := mod_dir_path.plus_file("ui/hud")
 	ModLoaderMod.install_script_extension(ui_extensions_dir.plus_file("player_damage_updater.gd"))
