@@ -3,13 +3,17 @@ extends Node
 const MOD_DIR_NAME := "Oudstand-ModOptions"
 const MOD_ID := "Oudstand-ModOptions"
 
+var changed_resources := []
+
 
 func _init():
+	ModLoaderLog.info("Init", MOD_ID + ":Main")
 	_fix_broken_script_classes()
 	var mod_dir_path := ModLoaderMod.get_unpacked_dir().plus_file(MOD_DIR_NAME)
 	_load_translations(mod_dir_path)
 	_install_extensions(mod_dir_path)
 	_setup_autoloads(mod_dir_path)
+	call_deferred("_install_scene_overrides")
 
 
 func _load_translations(mod_dir_path: String) -> void:
@@ -21,9 +25,12 @@ func _load_translations(mod_dir_path: String) -> void:
 func _install_extensions(mod_dir_path: String) -> void:
 	var extensions_dir := mod_dir_path.plus_file("extensions")
 	ModLoaderMod.install_script_extension(extensions_dir.plus_file("focus_emulator_extension.gd"))
-	
-	var scene_overwrite_1 = preload("res://mods-unpacked/Oudstand-ModOptions/extensions/menu_options.tscn")
+
+
+func _install_scene_overrides() -> void:
+	var scene_overwrite_1 = load("res://mods-unpacked/Oudstand-ModOptions/extensions/menu_options.tscn")
 	scene_overwrite_1.take_over_path("res://ui/menus/pages/menu_options.tscn")
+	changed_resources.append(scene_overwrite_1)
 
 
 func _setup_autoloads(mod_dir_path: String) -> void:
