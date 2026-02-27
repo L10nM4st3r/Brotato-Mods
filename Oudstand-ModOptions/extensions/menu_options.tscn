@@ -251,6 +251,15 @@ margin_right = 1815.0
 margin_left = 407.0
 margin_right = 1407.0
 
+[node name="Audio_Container" parent="Buttons/HBoxContainer3/TabContainer" index="0"]
+visible = true
+
+[node name="Accessibility_Container" parent="Buttons/HBoxContainer3/TabContainer" index="3"]
+visible = false
+
+[node name="AccessibilityContainer" parent="Buttons/HBoxContainer3/TabContainer/Accessibility_Container" index="0"]
+margin_right = 1000.0
+
 [node name="ramp_hue" parent="Buttons/HBoxContainer3/TabContainer/Accessibility_Container/AccessibilityContainer/ColorPositiveText/VBoxContainer/Setup_Color/PanelContainer/VBoxContainer/Slider_Hue" index="0"]
 texture = SubResource( 2 )
 

@@ -5,6 +5,7 @@ onready var OptionsMenu = get_node("/root/ModLoader/Oudstand-ModOptions")
 const OptionsTabFactory := preload("res://mods-unpacked/Oudstand-ModOptions/ui/options_tab_factory.gd")
 var factory_instance :OptionsTabFactory
 
+
 func _ready() -> void:
 	._ready()
 	_inject_mod_options()
@@ -24,7 +25,5 @@ func _inject_mod_options():
 	var settings_container = factory_instance.create_unified_options_tab(registered_mods)
 	if settings_container:
 		$Buttons/HBoxContainer3/TabContainer.add_child(settings_container)
-
-
-func _on_button_reset_mods_pressed():
-	pass # Replace with function body.
+	else:
+		$Buttons/HBoxContainer2/Mods_but.hide()
