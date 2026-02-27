@@ -21,6 +21,9 @@ func _load_translations(mod_dir_path: String) -> void:
 func _install_extensions(mod_dir_path: String) -> void:
 	var extensions_dir := mod_dir_path.plus_file("extensions")
 	ModLoaderMod.install_script_extension(extensions_dir.plus_file("focus_emulator_extension.gd"))
+	
+	var scene_overwrite_1 = preload("res://mods-unpacked/Oudstand-ModOptions/extensions/menu_options.tscn")
+	scene_overwrite_1.take_over_path("res://ui/menus/pages/menu_options.tscn")
 
 
 func _setup_autoloads(mod_dir_path: String) -> void:
@@ -38,8 +41,7 @@ func _setup_autoloads(mod_dir_path: String) -> void:
 
 
 func _create_autoload(script_path: String, node_name: String) -> Node:
-	var script = load(script_path)
-	var instance = script.new()
+	var instance = load(script_path).new()
 	instance.name = node_name
 	add_child(instance)
 	return instance

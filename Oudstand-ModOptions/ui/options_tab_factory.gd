@@ -1,4 +1,4 @@
-extends Node
+extends Resource
 
 # Resources used for creating UI elements
 const SLIDER_SCENE := "res://ui/menus/global/slider_option.tscn"
@@ -40,6 +40,7 @@ func create_unified_options_tab(registered_mods: Array) -> ScrollContainer:
 	# Add options for each mod with separators
 	for i in range(registered_mods.size()):
 		var mod_id = registered_mods[i]
+		
 		var config = mod_options.get_mod_config(mod_id) if mod_options else {}
 
 		if config.empty():
