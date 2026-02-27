@@ -41,7 +41,7 @@ func create_unified_options_tab(registered_mods: Array) -> HBoxContainer:
 	scroll_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll_container.follow_focus = true
-	scroll_container.rect_min_size.x = 650
+	scroll_container.rect_min_size.x = 1000
 	scroll_container.size_flags_stretch_ratio = 4
 	scroll_container.scroll_horizontal_enabled = false
 
@@ -254,7 +254,8 @@ func _create_dropdown_option(mod_id: String, option: Dictionary) -> Node:
 
 	# OptionButton
 	var option_button := OptionButton.new()
-	option_button.unique_name_in_owner = true
+	option_button.clip_text = true
+	option_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	# Add choices
 	var current_value = mod_options.get_value(mod_id, option.id) if mod_options else option.get("default", null)
@@ -429,6 +430,8 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 	# Dropdown for weapon/item selection (deduplicated)
 	var item_dropdown := OptionButton.new()
 	item_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	item_dropdown.clip_text = true
+	item_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	# Populate dropdown with unique items and icons
 	var selected_item_index = 0
@@ -457,6 +460,8 @@ func _add_item_row(container: VBoxContainer, mod_id: String, option: Dictionary,
 	# Dropdown for tier selection (only shown if multiple tiers available)
 	var tier_dropdown := OptionButton.new()
 	tier_dropdown.rect_min_size.x = 80
+	tier_dropdown.clip_text = true
+	tier_dropdown.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 
 	# Get the currently selected item's base name
 	var current_base_name = ""
