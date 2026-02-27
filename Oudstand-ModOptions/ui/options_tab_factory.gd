@@ -41,7 +41,7 @@ func create_unified_options_tab(registered_mods: Array) -> HBoxContainer:
 	scroll_container.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	scroll_container.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	scroll_container.follow_focus = true
-	scroll_container.rect_min_size.x = 800
+	scroll_container.rect_min_size.x = 650
 	scroll_container.size_flags_stretch_ratio = 4
 	scroll_container.scroll_horizontal_enabled = false
 
@@ -60,6 +60,7 @@ func create_unified_options_tab(registered_mods: Array) -> HBoxContainer:
 
 	
 	var header_sidebar_selector := VBoxContainer.new()
+	header_sidebar_selector.rect_min_size.x = 250
 	header_sidebar_selector.name = "HeaderSidebar"
 	vbox.set("custom_constants/separation", 15)
 	vbox.size_flags_vertical = Control.SIZE_EXPAND_FILL
@@ -151,7 +152,6 @@ func _add_mod_header(vbox: VBoxContainer, title: String, header_sidebar_selector
 	header_sidebar_selector.add_child(sidebar_button)
 	
 	sidebar_button.clip_text = true
-	sidebar_button.rect_min_size.x = 450
 	
 	var custom_font = FONT.duplicate()
 	custom_font.size = 24
